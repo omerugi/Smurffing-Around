@@ -351,7 +351,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * which creating the shortest path between src --> dest extracting the weight & path.
 	 * @return the cost value (double) && the shortest path src --> dest    
 	 */
-	private Object [] shortestPath_Dist(int src, int dest) {
+	public Object [] shortestPath_Dist(int src, int dest) {
 
 		List<node_data> temp = Dijkstra(src, dest);
 		if(temp == null ) {

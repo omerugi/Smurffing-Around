@@ -100,7 +100,13 @@ public class Edge implements edge_data, Serializable{
 			this.tag=t;
 	}
 	
-	public boolean isOn(double x, double y) {
+	public boolean isOn(double x, double y, double type) {
+		
+		if(src.getKey() < dest.getKey() &&  type == -1) {
+			return false;
+		}else if(src.getKey() > dest.getKey() &&  type == 1) {
+			return false;
+		}
 		
 		if((CalcLen(x, x1, y, y1)+CalcLen(x, x2, y, y2)) <= this.length+EPS 
 				&&(CalcLen(x, x1, y, y1)+CalcLen(x, x2, y, y2)) >= this.length-EPS)

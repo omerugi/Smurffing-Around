@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/java-json.jar"/>
 	<classpathentry kind="lib" path="lib/GameServer_v0.27.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dorge/eclipse-workspace/OOP-Ex3/lib/jl1.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -95,9 +95,7 @@ public class Edge implements edge_data, Serializable{
 
 	@Override
 	public void setTag(int t) {
-		if(t<0 || t>4) {return; }
-		else 
-			this.tag=t;
+		this.tag=t;
 	}
 	
 	public boolean isOn(double x, double y, double type) {

@@ -315,11 +315,27 @@ public class DGraph extends Observable  implements graph, Serializable {
 	public int getMC() {
 		return mc;
 	}
-//	public void func1() 
-//    { 
-//        setChanged(); 
-//        System.out.println("Change status with setChanged :" + hasChanged()); 
-//       notifyObservers(); 
-//    } 
+
+	
+	public void EdgeInitTag() {
+		Set setMapKey = vertex.keySet();
+		Iterator hit = setMapKey.iterator();
+		while(hit.hasNext()) {
+			
+			int a = (int) hit.next();
+			
+			Collection<edge_data> e = this.getE(a);
+			Iterator hit2 = e.iterator();
+			
+			while (hit2.hasNext()) {
+				
+				edge_data ee = (edge_data) hit2.next();
+				ee.setTag(-1);
+				
+			}
+			
+		}
+		
+	}
 
 }

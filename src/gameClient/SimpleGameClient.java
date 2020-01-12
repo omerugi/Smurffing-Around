@@ -133,6 +133,7 @@ public class SimpleGameClient {
 		while(game.isRunning()) { // while there is more time in the game
 			moveRobots(game, dgraph);
 			gui.repaint();
+			
 			if(System.currentTimeMillis() - first >= 10000){
 
 				first = System.currentTimeMillis();
@@ -166,21 +167,53 @@ public class SimpleGameClient {
 	 * @param gg
 	 * @param log
 	 */
+	static HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
 	static private void moveRobots(game_service game, DGraph gg) {
-		
+
 		List<String> log = game.move();
 		if(log!=null) {
-			long t = game.timeToEnd();
 			
-			get_fruit_edges(gg, game);
-			robot_edges(gg, game);
-			PickAmove(gg, game);
-			final_jorney(gg, game);
+			long t = game.timeToEnd();
+
+			List<String> Fruit = game.getFruits();
+			ArrayList<Edge> fruit_edges = new ArrayList<Edge>();
+
+			for (int j = 0; j < Fruit.size(); j++) {
+				try {
+					JSONObject obj = new JSONObject(Fruit.get(j));
+					JSONObject ff = obj.getJSONObject("Fruit");
+					double value = ff.getDouble("value");
+					double type = ff.getDouble("type");
+					String pos = ff.getString("pos");
+					StringTokenizer st1 = new StringTokenizer(pos, ","); 
+					double x = Double.parseDouble(st1.nextToken());
+					double y = Double.parseDouble(st1.nextToken());
+
+					Iterator hit = gg.getV().iterator();
+					while(hit.hasNext()) {
+
+						node_data v = (node_data) hit.next(); 
+						Collection<edge_data> edges = gg.getE(v.getKey());
+						if(edges == null) {continue;}
+
+						Iterator hit2 = edges.iterator();
+
+						while(hit2.hasNext()) {
+							Edge dest = (Edge) hit2.next();
+							if(dest.isOn(x, y,type)) {
+								fruit_edges.add(dest);
+							}
+						}
+					}
+				} catch (JSONException e) {e.printStackTrace();}
+
+			}
+			
 			
 			for(int i=0;i<log.size();i++) {
-				
+
 				String robot_json = log.get(i);
-				
+
 				try {
 					JSONObject line = new JSONObject(robot_json);
 					JSONObject ttt = line.getJSONObject("Robot");
@@ -188,28 +221,86 @@ public class SimpleGameClient {
 					int src = ttt.getInt("src");
 					int dest = ttt.getInt("dest");
 					
-					
-					if(robot_final_dest.containsKey(rid)) {		
-						if(robot_final_dest.get(rid) != null) {
-							dest = robot_final_dest.get(rid).remove().getKey();
-							if(dest == src) {
-								dest = robot_final_dest.get(rid).remove().getKey();
-							}
-							game.chooseNextEdge(rid, dest);
-							System.out.println("...........");
-						}
-						else {
-							get_fruit_edges(gg, game);
-							robot_edges(gg, game);
-							PickAmove(gg, game);
-							final_jorney(gg, game);
-						}
-
+					if(!robot_final_dest.containsKey(src)) {
+						robot_final_dest.put(src, null);
 					}
 					
+				}catch (Exception e) {}
+			}
+			
+			
+			Object [] min_path = null;
+			Graph_Algo ga = new Graph_Algo();
+			ga.init(gg);
+			int id = 0;
+			
+			for(int j=0; j<fruit_edges.size();j++) {
+				
+				min_path = null;
+				for(int i=0;i<log.size();i++) {
+
+					String robot_json = log.get(i);
+
+					try {
+						JSONObject line = new JSONObject(robot_json);
+						JSONObject ttt = line.getJSONObject("Robot");
+						int rid = ttt.getInt("id");
+						int src = ttt.getInt("src");
+						int dest = ttt.getInt("dest");
+
+						if(robot_final_dest.get(rid) != null) {continue;}
+						
+						Object [] temp_path = ga.shortestPath_Dist(src, fruit_edges.get(j).getSrc());
+						
+						if(min_path == null && temp_path != null) {
+							min_path = temp_path;
+							id =rid;
+						}else if(src == fruit_edges.get(j).getSrc()) {
+							min_path[0] = fruit_edges.get(j).getWeight();
+							List<node_data> temp = new LinkedList<node_data>();
+							temp.add( gg.getNode(fruit_edges.get(j).getSrc()));
+							min_path[1] =  temp;
+						}
+						else if((double)min_path[0] > (double)temp_path[0]) {
+							min_path = temp_path;
+							id =rid;
+						}
+					}
+					catch (JSONException e) {e.printStackTrace();}
+				}
+
+				if(min_path == null) {continue;}
+
+				Queue<node_data> q = new LinkedList<node_data>((List<node_data>) min_path[1]);
+				q.remove();
+				q.add(gg.getNode(fruit_edges.get(j).getDest()));
+				robot_final_dest.put(id, q);
+			}
+
+			for(int i=0;i<log.size();i++) {
+				String robot_json = log.get(i);
+				try {
+					JSONObject line = new JSONObject(robot_json);
+					JSONObject ttt = line.getJSONObject("Robot");
+					int rid = ttt.getInt("id");
+					int src = ttt.getInt("src");
+					int dest = ttt.getInt("dest");
+			
+					if(dest==-1 && robot_final_dest.get(rid) != null &&robot_final_dest.get(rid).size() != 0 ) {	
+						dest = robot_final_dest.get(rid).remove().getKey();
+						if(robot_final_dest.get(rid).size()==0) {
+							robot_final_dest.put(rid,null);
+						}
+						game.chooseNextEdge(rid, dest);
+						System.out.println(ttt);
+						System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
+						
+					}
 				} 
 				catch (JSONException e) {e.printStackTrace();}
 			}
+			
+
 		}
 	}
 	/**
@@ -362,7 +453,6 @@ public class SimpleGameClient {
 
 	}
 	
-	static private HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
 	
 	
 	static private void final_jorney(DGraph g, game_service game) {

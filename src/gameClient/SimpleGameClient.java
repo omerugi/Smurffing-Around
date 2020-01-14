@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
 import java.util.Queue;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -53,13 +54,7 @@ import sun.audio.AudioStream;
  * @author boaz.benmoshe
  *
  */
-public class SimpleGameClient implements Runnable {
-	
-	public static void main(String[] a) {
-		//SimplePlayer play = new SimplePlayer("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\music.mp3");
-		//Thread t = new Thread(play); t.run();
-		test1();
-		}
+public class SimpleGameClient extends Observable implements Runnable {
 	
 	public static void test1() {
 		JFrame frame = null; 
@@ -85,7 +80,7 @@ public class SimpleGameClient implements Runnable {
 
 		game_service game = Game_Server.getServer(Level_chooser); // you have [0,23] games this will pick what lvl we will play from the server
 
-		String graph_string = game.getGraph(); // game.getgrapf will bring me a json of the graph that I can place in a string 
+		String graph_string = game.getGraph(); // game.get grapf will bring me a json of the graph that I can place in a string 
 
 		DGraph dgraph = new DGraph();
 		dgraph.init(graph_string);
@@ -115,35 +110,43 @@ public class SimpleGameClient implements Runnable {
 
 		if(GameType_chooser == 1) {
 			playMenual(dgraph,game); 
+			
 		}else {
 			PlayAuto(dgraph,game);
 		}
 		
 		String results = game.toString();
 		System.out.println("Game Over: "+results);
-
 	}
 
 	private static void PlayAuto(DGraph dgraph, game_service game) {
-
+		
+		
 		GUI gui = new GUI(dgraph,game,0);
 		gui.setVisible(true);
 		
 		
 		game.startGame();
 		
+		int ind = 30; 
+		int delay = 18;
 		long first = System.currentTimeMillis();
 		while(game.isRunning()) { // while there is more time in the game
 			moveRobots(game, dgraph);
-			gui.repaint();
-			if(System.currentTimeMillis() - first >= 10000){
-				first = System.currentTimeMillis();
-			}
-			try {
-				Thread.sleep(50);
+		try {
+				
+				if(ind%4 == 0) { gui.repaint();}
+				ind++;
+				Thread.sleep(delay);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			
+			if(System.currentTimeMillis() - first >= 10000){
+				first = System.currentTimeMillis();
+			}
+			
+			
 		}
 
 	}
@@ -378,7 +381,7 @@ public class SimpleGameClient implements Runnable {
 						game.chooseNextEdge(rid, dest);
 						System.out.println(ttt);
 						System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
-
+						
 					}
 				} 
 				catch (JSONException e) {e.printStackTrace();}

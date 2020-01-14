@@ -60,10 +60,16 @@ public class Graph_Algo implements graph_algorithms{
 	/////////////////////////////////////////////////////////////////
 	public Graph_Algo() {}
 	
+	//will be used to isOn algo// 
+	double length = 0;
+	double x1 ;	double y1 ;
+	double x2 ;	double y2 ;
+	private final double EPS = 0.0000001;
+
 	public Graph_Algo(graph g) {
 		this.g = g;
 	}
-	
+
 	@Override
 	public void init(graph g) {
 		this.g = g;	
@@ -135,9 +141,9 @@ public class Graph_Algo implements graph_algorithms{
 	 */
 	@Override
 	public boolean isConnected() {
-		
+
 		if(g == null) { System.out.println("Graph is empty"); return false;}
-		
+
 		Collection<node_data> vertex = g.getV();
 		if(BFS(vertex)) { Collection<node_data> reverse_vertex = rev_collection(vertex.toArray());	return BFS(reverse_vertex);	}
 		return false;
@@ -184,7 +190,7 @@ public class Graph_Algo implements graph_algorithms{
 		while(!q.isEmpty()) {
 
 			node_data first_out = q.remove(); //dequeue the first in queue.
-			
+
 			Collection<edge_data> e = g.getE(first_out.getKey()); //getting all the neighboring.
 			if(e == null) {return false;} //if there are no edges coming out return false (indicates the graph cannot be connected).   
 			Iterator bgu = e.iterator();
@@ -249,14 +255,14 @@ public class Graph_Algo implements graph_algorithms{
 	 * @return shortest path between src & dest. 
 	 */
 	private ArrayList<node_data> Dijkstra(int src, int dest){
-		
+
 		Collection<node_data> vertex = g.getV(); // getting all vertexes.
-		
+
 		dosecontain(src,dest,vertex);
-		
+
 		all_Zero(vertex); //sets tag to 0; )Unvisited; 
 		all_inf(vertex); // sets the path cost to 0; 
-		
+
 		node_data a = g.getNode(src); //getting the start node. 
 		a.setWeight(0); //set star node path cost to 0; 
 		int counter=0; //Counter usage for stopping condition counts vertexes; 
@@ -327,7 +333,7 @@ public class Graph_Algo implements graph_algorithms{
 	 */
 	@Override
 	public double shortestPathDist(int src, int dest) {	
-		
+
 		if(g == null) { System.out.println("Graph is empty"); return -1;}
 
 		List<node_data> temp = Dijkstra(src, dest);
@@ -375,13 +381,13 @@ public class Graph_Algo implements graph_algorithms{
 	 */
 	@Override
 	public List<node_data> TSP(List<Integer> targets) {
-		
+
 		if(targets==null) {System.out.println("No targets Entered..");return null;}
 		targets=removeDuplicates(targets); // removing Duplicates.
 		if(!checkPathOfTargets(targets)) {return null;}
-	
+
 		targets=removeDuplicates(targets); // removing Duplicates. 
-		
+
 		double min_path = Double.MAX_VALUE;
 
 		double min_path_temp =-1; //base 
@@ -429,13 +435,13 @@ public class Graph_Algo implements graph_algorithms{
 	private boolean checkPathOfTargets(List<Integer> targets) {
 		Collection<node_data> t_check = new ArrayList<node_data>();
 		try {
-		for (int i = 0; i < targets.size(); i++) {
-			t_check.add(this.g.getNode(targets.get(i))); }
+			for (int i = 0; i < targets.size(); i++) {
+				t_check.add(this.g.getNode(targets.get(i))); }
 		}catch (Exception e) {
 			return false;
 		}
 		if(BFS(t_check)) {return true;}
-		
+
 		return false;
 	}
 	/**
@@ -447,8 +453,8 @@ public class Graph_Algo implements graph_algorithms{
 
 		int t1 = new Random().nextInt(targets.size()-1);
 		int t2 = new Random().nextInt(targets.size()-1);
-		
-		
+
+
 		if(targets.size()==1) return targets;
 		else if(targets.size()==2) {
 			int temp = targets.get(0);
@@ -484,8 +490,8 @@ public class Graph_Algo implements graph_algorithms{
 			new_g.addNode(new_v);
 
 		}
-		
-		
+
+
 		while(v_it.hasNext()) {	
 			node_data new_v = (node_data)v_it.next();
 
@@ -500,29 +506,29 @@ public class Graph_Algo implements graph_algorithms{
 
 		return new_g;
 	}
-	 public ArrayList<Integer> removeDuplicates(List<Integer> list) 
-	    { 
-	  
-	        // Create a new ArrayList 
-	        ArrayList<Integer> newList = new ArrayList<Integer>(); 
-	  
-	        // Traverse through the first list 
-	        for (Integer element : list) { 
-	  
-	            // If this element is not present in newList 
-	            // then add it 
-	            if (!newList.contains(element)) { 
-	  
-	                newList.add(element); 
-	            } 
-	        } 
-	  
-	        // return the new list 
-	        return newList; 
-	    } 
+	public ArrayList<Integer> removeDuplicates(List<Integer> list) 
+	{ 
 
-	 private boolean dosecontain(int src, int dest, Collection<node_data> vertex) {
-		
+		// Create a new ArrayList 
+		ArrayList<Integer> newList = new ArrayList<Integer>(); 
+
+		// Traverse through the first list 
+		for (Integer element : list) { 
+
+			// If this element is not present in newList 
+			// then add it 
+			if (!newList.contains(element)) { 
+
+				newList.add(element); 
+			} 
+		} 
+
+		// return the new list 
+		return newList; 
+	} 
+
+	private boolean dosecontain(int src, int dest, Collection<node_data> vertex) {
+
 		Iterator hit = vertex.iterator();
 		boolean a=false; boolean b=false; 
 		while (hit.hasNext())
@@ -531,13 +537,38 @@ public class Graph_Algo implements graph_algorithms{
 			if(nd.getKey()==src) 	{a =true;}
 			if(nd.getKey()==dest) 	{b =true;}
 		}
-		 if(a == false || b==false)
-			 return false;
-		 
-		 else
-			 return true;
-		 
-	 }
+		if(a == false || b==false)
+			return false;
+
+		else
+			return true;
+
+	}
+
+	private double CalcLen(double x1, double x2, double y1,double y2) {
+		//d=((x1-x2)^2+(y1-y2)^2)
+		return Math.sqrt(Math.pow((x1-x2),2)+Math.pow((y1-y2),2));
+	}
+	
+//	public boolean isOn(double x, double y, double type) {
+//		
+//	
+//		
+//		if(src.getKey() < dest.getKey() &&  type == -1) {
+//			return false;
+//		}else if(src.getKey() > dest.getKey() &&  type == 1) {
+//			return false;
+//		}
+//
+//		if((CalcLen(x, x1, y, y1)+CalcLen(x, x2, y, y2)) <= this.length+EPS 
+//				&&(CalcLen(x, x1, y, y1)+CalcLen(x, x2, y, y2)) >= this.length-EPS)
+//		{
+//			return true;
+//		}
+//		return false;
+//	} 
+
+
 
 	//|--------------------------------------------------------------------------------------------------------------------------------|
 	//|----------------------------------------------------SUB-CLASS-------------------------------------------------------------------|
@@ -553,7 +584,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * 
 	 */
 
- 	private class MinHeap{
+	private class MinHeap{
 
 		////////////////////////////////////////////
 		//////////////    fields     ///////////////

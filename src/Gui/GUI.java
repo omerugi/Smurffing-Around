@@ -48,12 +48,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sun.org.apache.xerces.internal.impl.xs.opti.DefaultXMLDocumentHandler;
+
 import Server.game_service;
 import dataStructure.DGraph;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
 import elements.NodeV;
+import gameClient.SimpleGameClient;
 import jdk.nashorn.internal.runtime.JSONListAdapter;
 import utils.Point3D;
 
@@ -61,6 +64,11 @@ import java.text.DecimalFormat;
 
 
 public class GUI extends JFrame implements ActionListener, MouseListener, Runnable, Observer {
+
+	/////////////////////////////////////////////////////////////////
+	//////////////////////////GUI_fields/////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 
 	private static final Graphics Graphics = null;
 	private static DecimalFormat df2 = new DecimalFormat("#.##");
@@ -73,6 +81,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	int [][] robotsDialog;
 	private Image i = null;
 	Graphics doubleD; 
+	/////////////////////////////////////////////////////////////////
+	/////////////////////GUI_window_fields//////////////////////////
+	////////////////////////////////////////////////////////////////
 
 	private double min_x = 3000;		private double min_y = 3000;
 	private double max_x = 0;			private double max_y = 0;
@@ -80,16 +91,20 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	private int X_Axis = 1750;		private int Y_Axis = 870;
 
 
-	private int defultx = 2000;	private int defulty = 1050;
+	private int defultx = 1800;	private int defulty = 900;
 
 
 	private static final int DEFAULT_SIZE = 500;
+	private static final Observable SimpleGameClient = null;
 	private static double penRadius;
 
+
+
+	//control action for paint//
 	int action=0;
 
 	//holds the vertex points.\\ 
-	//ArrayList<NodeV> p_list = new ArrayList<NodeV>(); 
+	//ArrayList<NodeV> p_list = new ArrayList<NodeV>();\\ 
 	public Collection<node_data> vertex;
 
 	// contains all the edges by ID(src ver) and edge_data. 
@@ -97,7 +112,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	private graph graph;
 	Graph_Algo G = new Graph_Algo();
 	private game_service game;
-	private int Auto_Menual=0; //0 Auto, 1 Menual
+//	private int Auto_Menual=0; //0 Auto, 1 Menual
+	//long TimeToEnd = game.timeToEnd();
 
 
 	/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -116,14 +132,23 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	public GUI(graph dg, game_service game,int Auto_Menual)
 	{
 		initGUI();
-		this.Auto_Menual = Auto_Menual;
+	//	this.Auto_Menual = Auto_Menual;
 		this.game = game; 
 		this.vertex	= dg.getV();
 		this.graph = dg;
 		G.init(this.graph);
 		((Observable) graph).addObserver(this);
+		//((Observable) SimpleGameClient).addObserver(this);
 	}
 
+	public void GameOver() {
+
+
+		ImageIcon GameOver = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\GameOver.png");
+		Image  GameOver1  = GameOver.getImage();
+		g2.drawImage(GameOver1,defultx/2 ,defulty/2,1000,1000, this);
+
+	}
 
 	/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 	/////////////////////////   window settings  \\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -134,9 +159,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		this.setSize(defultx,defulty);
 		this.setBackground(Color.WHITE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		ImageIcon ImageIcon5 = new ImageIcon("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\GameIcon.png");
-		Image GameIcon   =	ImageIcon5.getImage();
+		ImageIcon ImageIcon5 = new ImageIcon("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\GameIcon.jpg");
+		Image GameIcon  =	ImageIcon5.getImage();
 		this.setIconImage(GameIcon);
+
+
 
 		//creating menu bar//
 		MenuBar menuBar	 = new MenuBar();
@@ -181,43 +208,66 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	private  Graphics2D g3;
 
 
+	//////////////////////////////////////////////Paint///////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void paint(Graphics g)
 	{	
 		//call paint func\\
-		if(buff == null || g2 == null ) {
+		if(buff == null || g2 == null || (this.WIDTH != defultx || this.HEIGHT != defulty )) {
+			defultx = this.getWidth();
+			defulty = this.getHeight();
 			settings();
 			buff = new BufferedImage(defultx, defulty, BufferedImage.TYPE_INT_ARGB);
 			g2 = buff.createGraphics();
 			super.paint(g2);
 			paintgraph(g2);
-			
+
 		}
 
 		Graphics g2_comp = (Graphics2D)g;
 		g2_comp.drawImage(buff,0,0,null);
-		paintfruits(g2_comp);
+		paintsmurfs(g2_comp);
+
 		paintrobotsAuto(g2_comp);
-			
 		
+		
+		if(game.timeToEnd()/100<1) {	
+			ImageIcon GameOver = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\GameOver.png");
+			Image  GameOver1  = GameOver.getImage();
+			g.drawImage(GameOver1, 350 ,100,1200,1000, this);
+			this.GameOver();
+		}
 
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////EndPaint//////////////////////////////////////////////////////////////
 
-
-
+	/**
+	 * this function used to reallocate the real y position to the window size position. 
+	 * @param yv y coordinate
+	 * @return
+	 */
 	private int reallocY(double yv) {
 
 		double PresentOfScreen = (yv-min_y)/(max_y-min_y);
-		yv= (PresentOfScreen*(defulty-500)+250);
+		yv= (defulty)-(PresentOfScreen*(defulty-500)+250);
 		return (int) yv;
 	}
 
+	/**
+	 * this function used to reallocate the real x position to the window size position. 
+	 * @param xv x coordinate
+	 * @return
+	 */
 	private int reallocX(double xv) {
 
 		double PresentOfScreen = (xv-min_x)/(max_x-min_x);
 		xv= (PresentOfScreen*(defultx-500)+250);
 		return (int) xv;
 	}
-
+	/**
+	 * this function sets the gui window scale.
+	 */
 	private void settings() {
 
 		Iterator hit = vertex.iterator();
@@ -250,199 +300,32 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 		int x = e.getX();
 		int y = e.getY();
-		
-		/**
-		robot[i].x-20, robot[i].y-20 	//top left peremeter
-		robot[i].x+20, robot[i].y+20	// buttom right
-
-		robot[i].x, robot[i].y+20 		// right
-		robot[i].x+20, robot[i].y 		// left
-		 **/
 
 
-		ifthereIsRobot(x,y);
+		System.out.println("x:" +x+""+y);
 
 	}
 
-
-	private void ifthereIsRobot(int x, int y) {
-		System.out.println("x: "+x+ " "+ "y: "+y);
-		
-		int [][] temp = robotsDialog;
-		
-		for (int i = 0; i < robotsDialog.length; i++) { //go over robots list
-			if(robotsDialog[i][1] == -1) 
-			{
-				if((robotsDialog[i][2]-20 < x && robotsDialog[i][2]+20 > x) && (robotsDialog[i][3]-20 < y && robotsDialog[i][3]+20 > y) )
-				{
-					Frame frame=null; boolean flag = true; 
-					int d =-1;
-					while (flag==true) {
-
-						String temp1 = JOptionPane.showInputDialog(frame,"Enter Robot Destenation: ");
-						if(temp1.matches("\\d+")) {
-							d =Integer.parseInt(temp1);	
-							if(graph.getNode(d)!=null) {flag=false; continue;}
-						}	
-					}flag =true;
-
-					game.chooseNextEdge(robotsDialog[i][0],d);
-					paintrobotsMenual(this.g3);
-					repaint();
-
-				}
-			}
-
-		}
-		System.out.println(robotsDialog);
-
-	}
 	@Override
 	public void mouseReleased(MouseEvent e) {}
 
 	@Override
 	public void actionPerformed(ActionEvent e) 
-	{
-
-		///////////////////////////////////////////////
-		/////////////Saving Command\\\\\\\\\\\\\\\\\\\\\
-		////////////////////////////////////////////////
-
-
-		if(e.getActionCommand() == "Save") {
-			action= 0;
-			repaint();
-			FileDialog chooser = new FileDialog(frame, "Use a .txt extension", FileDialog.SAVE);
-			chooser.setVisible(true);
-			String filename =chooser.getDirectory()+chooser.getFile();
-			G.save(filename);
-			System.out.println(G);
-
-		}
-
-
-		///////////////////////////////////////////////
-		/////////////ShortPath Command\\\\\\\\\\\\\\\\\
-		////////////////////////////////////////////////
-
-
-		else if(e.getActionCommand() == "Short Path") {
-
-			action= 0;
-			repaint();
-			JFrame f = null; 
-			try {
-				int src=0, Dest=0;
-				boolean flag = true; 	
-				String temp1="",temp2=""; 
-
-				while (flag==true) {
-
-					temp1 	= JOptionPane.showInputDialog(f,"Enter src ID: ");
-					if(temp1.matches("\\d+")) {
-						src =Integer.parseInt(temp1);	
-						if(graph.getNode(src)!=null) {flag=false; continue;}
-					}	System.out.println("src Not Valid");
-				}flag =true;
-
-
-				while (flag==true) {
-
-					temp1 	= JOptionPane.showInputDialog(f,"Enter Dest ID: ");
-					if(temp1.matches("\\d+")) {
-						Dest =Integer.parseInt(temp1);	
-						if(graph.getNode(Dest)!=null) {flag=false; continue;}
-					}	System.out.println("dest Not Valid");
-				}flag =true;
-
-				graph_algorithms a = new Graph_Algo();
-				a.init(graph);
-				path =a.shortestPath(src,Dest);
-				pathweight = a.shortestPathDist(src, Dest);
-				if(path==null) {System.out.println("null");}
-				else {		action = 1;
-				repaint();}
-			}catch (Exception es) {}
-		}
-
-
-
-		///////////////////////////////////////////////
-		//////////////////TSP Command\\\\\\\\\\\\\\\\\\\
-		////////////////////////////////////////////////
-
-
-
-		else if(e.getActionCommand() == ("TSP")) {
-			action= 0;
-			repaint();
-			JFrame f = null;  
-			graph_algorithms a = new Graph_Algo();
-			a.init(graph);
-			boolean flag =true; String temp1="";
-			int src=0,Dest=0;int size_of_tr=0;
-			ArrayList<Integer> targets = new ArrayList<Integer>(); ;			
-
-			try {
-				//input targets\\
-				while(flag==true) {
-
-					if(targets.size()==vertex.size()) {flag=false; continue;}
-					temp1 = JOptionPane.showInputDialog(f,"Enter targets src ID (enter: Done when finish)");
-					if(temp1.equals("done") || temp1.equals("Done") ) {flag=false; continue;}
-					else {
-						if(temp1.matches("\\d+")) {
-							int targ = Integer.parseInt(temp1);
-							//containe allready
-							if(targets.contains(targ)) {System.out.println("This vertex allready in the search path");}
-							//isvalid < vertex.size
-							else if(graph.getNode(targ)==null) {System.out.println("This vertex doesnt exists");}
-							//adding the target
-							else {	targets.add(targ); }
-						}
-					}
-				}
-
-				//copy the path for paint\\
-				path = null;
-				path = a.TSP(targets);
-				System.out.println(path);
-				//set action;
-				action=3;
-				repaint();
-			}
-			catch (Exception es) {}
-		}
-
-
-		///////////////////////////////////////////////
-		//////////////// Clean All   \\\\\\\\\\\\\\\\\\\
-		////////////////////////////////////////////////
-
-		else if(e.getActionCommand() == ("clean all")) {
-
-			action=0; 
-			this.graph = null;
-			repaint();
-		}
-
-	}
+	{}
 
 	@Override
 	public void run() {
 		repaint();
-
 	}
 
 
 	@Override
 	public void update(Observable o, Object arg) {
-
 		repaint();
 		run();
 	}
 
-
+	////////////////////////////////////////////Graph Paint////////////////////////////////////////////////////////////////////////
 	private void paintgraph(Graphics g) {
 		g.setColor(Color.blue);
 		Iterator hit = vertex.iterator();
@@ -456,10 +339,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 			g.setColor(Color.BLUE);
 
 			int i=0;
-
-
-			//int xv=graph.getNode(v.getKey()).getLocation().x();
-			//int yv=graph.getNode(v.getKey()).getLocation().y();
 
 			int xv = reallocX(graph.getNode(v.getKey()).getLocation().x());
 			int yv = reallocY(graph.getNode(v.getKey()).getLocation().y());
@@ -512,9 +391,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 	}
 
+	///////////////////////////////////////////////////Paint Graph End////////////////////////////////////////////////////////
 
 
-	private void paintfruits(Graphics g) {
+	///////////////////////////////////////////////////Paint smurfs///////////////////////////////////////////////////////////
+	private void paintsmurfs(Graphics g) {
 		List<String> Fruit = game.getFruits();
 
 		for (int j = 0; j < Fruit.size(); j++) {
@@ -538,10 +419,10 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 				Image  Dardasit1   =	Dardasit.getImage();
 
 				if(type == -1) {
-					g.drawImage(DardasAba1, reallocX(x), reallocY(y),100,100, this);
+					g.drawImage(DardasAba1, reallocX(x)-30, reallocY(y)-30,50,50, this);
 				}
 				else {
-					g.drawImage(Dardasit1, reallocX(x), reallocY(y),100,100, this);
+					g.drawImage(Dardasit1, reallocX(x)-30, reallocY(y)-30,50,50, this);
 				}
 
 
@@ -552,7 +433,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 	}
 
-
+	///////////////////////////////////////////////////Paint smurfs End//////////////////////////////////////////////////////
 	private void paintrobotsAuto(Graphics g) {
 		List<String> ArnoldSchwarzenegge = game.getRobots();
 		for (int j = 0; j < ArnoldSchwarzenegge.size(); j++) {
@@ -571,10 +452,12 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 				ImageIcon Gargamel = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\Gargamel.png");
 				Image  Gargamel1  = Gargamel.getImage();
-				g.drawImage(Gargamel1, reallocX(x)-20, reallocY(y)-20,100,100, this);
+				g.drawImage(Gargamel1, reallocX(x)-30, reallocY(y)-30,80,80, this);
 				g.setColor(Color.RED);
 				g.drawString(""+rid, reallocX(x)-20, reallocY(y)-20);
 			} catch (JSONException e) {e.printStackTrace();}
+
+
 
 
 		}
@@ -595,7 +478,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 				int src = ff.getInt("src");
 				int dest = ff.getInt("dest");
 				String pos = ff.getString("pos");
-				
+
 				System.out.println(dest);
 
 				StringTokenizer st1 = new StringTokenizer(pos, ","); 
@@ -616,15 +499,10 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 			} catch (JSONException e) {e.printStackTrace();}
 
 
-		}moveRobotsMenual();
+		}
 
 
 	}
-	private void moveRobotsMenual() {
-
-
-	}
-
 
 }
 

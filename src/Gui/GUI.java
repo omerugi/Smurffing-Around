@@ -1,65 +1,35 @@
 package Gui;
 import algorithms.Graph_Algo;
-import algorithms.graph_algorithms;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.BorderLayout;
+import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FileDialog;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Label;
-import java.awt.MediaTracker;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Scanner;
 import java.util.StringTokenizer;
-
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.sun.org.apache.xerces.internal.impl.xs.opti.DefaultXMLDocumentHandler;
-
 import Server.game_service;
-import dataStructure.DGraph;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
-import elements.NodeV;
-import gameClient.SimpleGameClient;
-import jdk.nashorn.internal.runtime.JSONListAdapter;
-import utils.Point3D;
-
 import java.text.DecimalFormat;
 
 
@@ -79,7 +49,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	double pathweight =-1;
 	List<node_data> path;
 	int [][] robotsDialog;
-	private Image i = null;
 	Graphics doubleD; 
 	/////////////////////////////////////////////////////////////////
 	/////////////////////GUI_window_fields//////////////////////////
@@ -88,23 +57,14 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	private double min_x = 3000;		private double min_y = 3000;
 	private double max_x = 0;			private double max_y = 0;
 
-	private int X_Axis = 1750;		private int Y_Axis = 870;
+	//private int X_Axis = 1750;		private int Y_Axis = 870;
 
 
 	private int defultx = 1800;	private int defulty = 900;
-
-
-	private static final int DEFAULT_SIZE = 500;
-	private static final Observable SimpleGameClient = null;
-	private static double penRadius;
-
-
-
+	
 	//control action for paint//
 	int action=0;
 
-	//holds the vertex points.\\ 
-	//ArrayList<NodeV> p_list = new ArrayList<NodeV>();\\ 
 	public Collection<node_data> vertex;
 
 	// contains all the edges by ID(src ver) and edge_data. 
@@ -112,8 +72,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	private graph graph;
 	Graph_Algo G = new Graph_Algo();
 	private game_service game;
-//	private int Auto_Menual=0; //0 Auto, 1 Menual
-	//long TimeToEnd = game.timeToEnd();
 
 
 	/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -132,22 +90,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	public GUI(graph dg, game_service game,int Auto_Menual)
 	{
 		initGUI();
-	//	this.Auto_Menual = Auto_Menual;
 		this.game = game; 
 		this.vertex	= dg.getV();
 		this.graph = dg;
 		G.init(this.graph);
 		((Observable) graph).addObserver(this);
-		//((Observable) SimpleGameClient).addObserver(this);
-	}
-
-	public void GameOver() {
-
-
-		ImageIcon GameOver = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\GameOver.png");
-		Image  GameOver1  = GameOver.getImage();
-		g2.drawImage(GameOver1,defultx/2 ,defulty/2,1000,1000, this);
-
 	}
 
 	/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -155,10 +102,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	//////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	private void initGUI() {
-
+		
+		
 		this.setSize(defultx,defulty);
-		this.setBackground(Color.WHITE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		ImageIcon ImageIcon5 = new ImageIcon("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\GameIcon.jpg");
 		Image GameIcon  =	ImageIcon5.getImage();
 		this.setIconImage(GameIcon);
@@ -207,13 +155,26 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	private BufferedImage buff3;
 	private  Graphics2D g3;
 
-
+	JLabel background = null;
 	//////////////////////////////////////////////Paint///////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void paint(Graphics g)
 	{	
 		//call paint func\\
 		if(buff == null || g2 == null || (this.WIDTH != defultx || this.HEIGHT != defulty )) {
+			
+			if((this.WIDTH != defultx || this.HEIGHT != defulty) && background != null ) {
+				remove(background);
+			}
+			
+			setLayout(null);
+			ImageIcon img = new ImageIcon("data\\background.jpg");
+			background = new JLabel("", img ,JLabel.CENTER);
+			background.setBounds(0,0, defultx-17, defulty-40);
+		
+			
+			add(background);
+			
 			defultx = this.getWidth();
 			defulty = this.getHeight();
 			settings();
@@ -226,16 +187,23 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 		Graphics g2_comp = (Graphics2D)g;
 		g2_comp.drawImage(buff,0,0,null);
+		
+		
+		
+		
+		ImageIcon snoop = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\snoop2.gif");
+		Image  snoop1  = snoop.getImage();
+		g2_comp.drawImage(snoop1, 350 ,100,1200,1000, this);
+		
 		paintsmurfs(g2_comp);
-
+	
 		paintrobotsAuto(g2_comp);
 		
 		
 		if(game.timeToEnd()/100<1) {	
-			ImageIcon GameOver = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\GameOver.png");
+			ImageIcon GameOver = new ImageIcon("GameOver.png");
 			Image  GameOver1  = GameOver.getImage();
-			g.drawImage(GameOver1, 350 ,100,1200,1000, this);
-			this.GameOver();
+			g.drawImage(GameOver1, 0, 0,defultx-17, defulty-40, this);
 		}
 
 	}
@@ -327,40 +295,37 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 	////////////////////////////////////////////Graph Paint////////////////////////////////////////////////////////////////////////
 	private void paintgraph(Graphics g) {
+		
+		super.paintComponents(g);
+		Graphics2D g4 = (Graphics2D) g;
+	
+		
 		g.setColor(Color.blue);
+		
 		Iterator hit = vertex.iterator();
 		while(hit.hasNext()) {
-
+			//sets the line thickness
+			g4.setStroke(new BasicStroke(5));
+			//sets the txt size 
+			float f=13.0f; // font size.
+			g4.setFont(g4.getFont().deriveFont(f));
+		
+			
 			/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 			////////////////creating the vertex on Screen \\\\\\\\\\\\\\\\\\\\\\\\\
-			//////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-			node_data v = (node_data) hit.next(); 
-			g.setColor(Color.BLUE);
-
+			node_data v = (node_data) hit.next();
 			int i=0;
 
 			int xv = reallocX(graph.getNode(v.getKey()).getLocation().x());
 			int yv = reallocY(graph.getNode(v.getKey()).getLocation().y());
-
-			g.drawRect(xv-10,yv-10,20,20);
-
-			g.drawString(""+v.getKey(),xv-2,yv+5);
-
-
 			/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 			////////////////creating edges to the vertex \\\\\\\\\\\\\\\\\\\\\\\\\\
-			//////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
 			edges = graph.getE(v.getKey());
 			if(edges == null) {continue;}
-
 			//go over the edges that come out of the specific vertex\\ 
 			Iterator hit2 = edges.iterator();
 
 			while(hit2.hasNext()) {
-
-
 				g.setColor(Color.red);
 
 				edge_data dest = (edge_data) hit2.next();
@@ -381,12 +346,31 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 				g.fillOval(((x1*1)/5)+((x2*4)/5),((y1*1)/5)+((y2*4)/5) , 15, 15);
 
 				double w = dest.getWeight();
-
 				g.setColor(Color.MAGENTA);
-
-				g.drawString(df2.format(w),((x1*1)/3)+((x2*2)/3),((y1*1)/3)+((y2*2)/3));
-
+				g.drawString(df2.format(w),((x1*1)/3)+((x2*2)/3),((y1*1)/3)+((y2*2)/3));	
 			}
+			
+		}
+		/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		//////////////////////Painting the Vertexes\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		
+		Iterator hit3 = vertex.iterator();
+		while(hit3.hasNext()) {
+
+			node_data v = (node_data) hit3.next();
+			int i=0;
+			int xv = reallocX(graph.getNode(v.getKey()).getLocation().x());
+			int yv = reallocY(graph.getNode(v.getKey()).getLocation().y());
+			ImageIcon SmurfsHouse = new ImageIcon("data\\SmurfsHouse.png");
+			Image  SmurfsHouse1  = SmurfsHouse.getImage();
+			g.drawImage(SmurfsHouse1, xv-25 ,yv-25,35,35, this);
+			
+			g.setColor(Color.BLACK);
+			float f=20.0f; // font size.
+			
+			g4.setFont(g4.getFont().deriveFont(f));
+			g.drawString(""+v.getKey(),xv-9,yv+3);
+		
 		}
 
 	}

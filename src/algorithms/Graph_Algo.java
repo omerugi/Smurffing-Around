@@ -22,7 +22,9 @@ import java.util.Random;
 import java.util.Set;
 
 import elements.Edge;
+import elements.Fruit;
 import elements.NodeV;
+import utils.Point3D;
 /**
  * This class holds implementations of graph_algorithems interface.
  * Algorithms: 
@@ -45,7 +47,7 @@ import elements.NodeV;
  * @author Dor Getter && Omer Rugi  
  *
  */
-public class Graph_Algo implements graph_algorithms{
+public class Graph_Algo  {
 
 
 
@@ -59,18 +61,14 @@ public class Graph_Algo implements graph_algorithms{
 	///////////////////     Constructor     /////////////////////////
 	/////////////////////////////////////////////////////////////////
 	public Graph_Algo() {}
-	
-	//will be used to isOn algo// 
-	double length = 0;
-	double x1 ;	double y1 ;
-	double x2 ;	double y2 ;
-	private final double EPS = 0.0000001;
+
+	private static final double EPS = 0.0000001;
 
 	public Graph_Algo(graph g) {
 		this.g = g;
 	}
 
-	@Override
+
 	public void init(graph g) {
 		this.g = g;	
 	}
@@ -83,7 +81,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * Initialized graph from file
 	 * @param g
 	 */
-	@Override
+
 	public void init(String file_name) {
 		graph temp = null;
 		try
@@ -109,7 +107,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * in given name; 
 	 * @param file_name: Name of the file wished to save in.
 	 */
-	@Override
+
 	public void save(String file_name) {
 		//holds the wished name to save by;
 		String filename = file_name;
@@ -139,13 +137,13 @@ public class Graph_Algo implements graph_algorithms{
 	 * . 
 	 * if all vertexes been visited it returns true;   
 	 */
-	@Override
-	public boolean isConnected() {
+
+	static public boolean isConnected(DGraph g) {
 
 		if(g == null) { System.out.println("Graph is empty"); return false;}
 
 		Collection<node_data> vertex = g.getV();
-		if(BFS(vertex)) { Collection<node_data> reverse_vertex = rev_collection(vertex.toArray());	return BFS(reverse_vertex);	}
+		if(BFS(vertex,g)) { Collection<node_data> reverse_vertex = rev_collection(vertex.toArray());	return BFS(reverse_vertex,g);	}
 		return false;
 	}
 	/**
@@ -153,7 +151,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * @param array Obj array; 
 	 * @return reverse node_data Collection.  
 	 */
-	private Collection<node_data> rev_collection(Object [] array) {
+	static private Collection<node_data> rev_collection(Object [] array) {
 
 		Collection<node_data> rev = new ArrayList<node_data>();
 		for (int i = array.length-1; i >= 0; i--) {
@@ -175,7 +173,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * @param vertex collections of vertexes of the graph.
 	 * @return boolean , true: if all vertexes been visited, false otherwise;  
 	 */
-	private boolean BFS(Collection<node_data> vertex) {
+	static private boolean BFS(Collection<node_data> vertex, DGraph g) {
 
 		Queue<node_data> q = new LinkedList<node_data>();
 		if(vertex.isEmpty()) {
@@ -210,7 +208,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * @param vertex
 	 * @return true: all marked 1 , false: if at least one vertex tag 0 ;
 	 */
-	private boolean check_all_visited(Collection<node_data> vertex) {
+	private static boolean check_all_visited(Collection<node_data> vertex) {
 
 		Iterator idc = vertex.iterator();
 		while(idc.hasNext()) {
@@ -223,7 +221,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * Iterates Over all vertexes and set tag to 0; (unvisited);
 	 * @param vertex
 	 */
-	private void all_Zero(Collection<node_data> vertex) {
+	static private void all_Zero(Collection<node_data> vertex) {
 		Iterator tau = vertex.iterator();
 		while(tau.hasNext()) {node_data check = (node_data) tau.next();	check.setTag(0);}
 	}
@@ -231,7 +229,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * Iterates Over all vertexes and set weight to infinity; (unvisited);
 	 * @param vertex
 	 */
-	private void all_inf(Collection<node_data> vertex) {
+	static private void all_inf(Collection<node_data> vertex) {
 		Iterator tau = vertex.iterator();
 		while(tau.hasNext()) {	node_data check = (node_data) tau.next();	check.setWeight(Double.MAX_VALUE);}
 	}
@@ -254,7 +252,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * @param dest end point . 
 	 * @return shortest path between src & dest. 
 	 */
-	private ArrayList<node_data> Dijkstra(int src, int dest){
+	private static ArrayList<node_data> DijkstraNode(int src, int dest,DGraph g){
 
 		Collection<node_data> vertex = g.getV(); // getting all vertexes.
 
@@ -273,7 +271,7 @@ public class Graph_Algo implements graph_algorithms{
 
 		heap.add((node_data) a, 0, a.getKey(),prev_id); //adding the start node to heap; 
 		if(src == dest) { //stoping condition. 
-			return createpath(src,dest,prev_id);
+			return createpath(src,dest,prev_id,g);
 		}
 
 		while(counter != vertex.size() && !heap.isEmpty()) {
@@ -296,8 +294,83 @@ public class Graph_Algo implements graph_algorithms{
 			counter++; 
 		}
 
-		return createpath(src,dest,prev_id); //rearrange the order of the path from end-->start to start-->end; 
+
+		return createpath(src,dest,prev_id,g); //rearrange the order of the path from end-->start to start-->end; 
+
 	}
+
+
+	private static ArrayList<Edge> DijkstraEdge(int src, int dest,DGraph g){
+
+		Collection<node_data> vertex = g.getV(); // getting all vertexes.
+
+		dosecontain(src,dest,vertex);
+
+		all_Zero(vertex); //sets tag to 0; )Unvisited; 
+		all_inf(vertex); // sets the path cost to 0; 
+
+		node_data a = g.getNode(src); //getting the start node. 
+		a.setWeight(0); //set star node path cost to 0; 
+		int counter=0; //Counter usage for stopping condition counts vertexes; 
+
+		MinHeap heap = new MinHeap(); //Will store the least valued path next vertex; 
+
+		HashMap<Integer, Integer> prev_id = new HashMap<Integer, Integer>(); //Will store the previous node in the path. 
+
+		heap.add((node_data) a, 0, a.getKey(),prev_id); //adding the start node to heap; 
+		if(src == dest) { //stoping condition. 
+			return createpath_edge(src,dest,prev_id,g);
+		}
+
+		while(counter != vertex.size() && !heap.isEmpty()) {
+			node_data pop = heap.pop(); //pop the least valued path node. 
+			if(pop.getTag()==1) {continue;}	//if visited already just continue;
+			pop.setTag(1); // visited pop
+
+			if(pop.getKey() == dest) {counter = vertex.size(); continue;} //another stopping condition.(reached destination) 
+
+			Collection<edge_data> e = g.getE(pop.getKey());		
+			if(e==null) {continue;}
+			Iterator<edge_data> edges =  e.iterator(); 
+
+			while(edges.hasNext()) //adding all sons of the node.
+			{
+				edge_data temp = edges.next(); 
+				if(g.getNode(temp.getDest()).getTag()==1) {continue;} //if visited continue;
+				heap.add((NodeV) g.getNode(temp.getDest()) , temp.getWeight()+pop.getWeight(), pop.getKey(),prev_id); //else add the node to the heap; 
+			}
+			counter++; 
+		}
+
+		return createpath_edge(src,dest,prev_id,g); //rearrange the order of the path from end-->start to start-->end; 
+
+	}
+
+
+	private static ArrayList<Edge> createpath_edge(int src, int dest, HashMap<Integer, Integer> prev_id,DGraph g) {
+
+
+		if(g.getNode(dest).getWeight() == Double.MAX_VALUE) { return null;}
+		ArrayList<Edge> path = new ArrayList<Edge>();
+
+		node_data a = (node_data) g.getNode(dest);
+		while(a.getKey() != src) {
+			
+			path.add((Edge) g.getEdge(prev_id.get(a.getKey()),a.getKey() ));
+			int prev = prev_id.get(a.getKey()) ;
+			a = (node_data) g.getNode(prev);
+		}
+
+		ArrayList<Edge> new_path = new ArrayList<Edge>();
+
+		for (int i = path.size()-1; i >=0; i--) {
+			new_path.add(path.get(i));
+		}
+
+		return new_path;
+	}
+
+
 	/**
 	 * 
 	 * iterates from destination node backwards by using the prev_id to determine the 
@@ -309,7 +382,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * @param prev_id data structure to hold the father of a node in a path. 
 	 * @return the path src --> destination
 	 */
-	private ArrayList<node_data> createpath(int src,int dest,HashMap<Integer, Integer> prev_id) {
+	static private ArrayList<node_data> createpath(int src,int dest,HashMap<Integer, Integer> prev_id,DGraph g) {
 
 		if(g.getNode(dest).getWeight() == Double.MAX_VALUE) { return null;}
 		ArrayList<node_data> path = new ArrayList<node_data>();
@@ -331,43 +404,94 @@ public class Graph_Algo implements graph_algorithms{
 	 * which creating the shortest path between src --> dest extracting the weight of the path.
 	 * @return the cost value (double) of the shortest path src --> dest.   
 	 */
-	@Override
-	public double shortestPathDist(int src, int dest) {	
+
+	static public double shortestPathDist(int src, int dest,DGraph g,int pick) {	
 
 		if(g == null) { System.out.println("Graph is empty"); return -1;}
 
-		List<node_data> temp = Dijkstra(src, dest);
-		if(temp == null ) {
-			return -1; 
+		if(pick == 0) {
+			List<node_data> temp = DijkstraNode(src, dest, g);
+			if(temp == null ) {
+				return -1; 
+			}
+			return temp.get(temp.size()-1).getWeight();
+		}else {
+			List<Edge> temp = DijkstraEdge(src, dest, g);
+			if(temp == null ) {
+				return -1; 
+			}
+			return g.getNode(temp.get(temp.size()-1).getDest()).getWeight();
 		}
-
-		return temp.get(temp.size()-1).getWeight();
 	}
 	/**
 	 * Using a Dijkstra method
 	 * which creating the shortest path between src --> dest extracting the path.
 	 * @return the shortest path src --> dest.   
 	 */
-	@Override
-	public List<node_data> shortestPath(int src, int dest) {
-		return Dijkstra(src, dest);
+
+	static public List<node_data> shortestPath(int src, int dest,DGraph g) {
+		return DijkstraNode(src, dest,g);
 	}
+	
+	/**
+	 * Using a Dijkstra method
+	 * which creating the shortest path between src --> dest extracting the path.
+	 * @return the shortest path src --> dest.   
+	 */
+
+	static public List<Edge> shortestPathEdges(int src, int dest,DGraph g) {
+		return DijkstraEdge(src, dest,g);
+	}
+	
+	
 	/**
 	 * Using a Dijkstra method
 	 * which creating the shortest path between src --> dest extracting the weight & path.
 	 * @return the cost value (double) && the shortest path src --> dest    
 	 */
-	public Object [] shortestPath_Dist(int src, int dest) {
+	public static Object [] shortestPath_Dist(int src, int dest,DGraph g,Fruit fruit, int pick) {
 
-		List<node_data> temp = Dijkstra(src, dest);
+		if(src == dest) {
+			if(pick ==0) {
+			List<node_data> temp = new ArrayList<node_data>();
+			temp.add(g.getNode(src)); 
+			temp.add(g.getNode(fruit.getFruitEdge().getDest()));
+			Object [] arr = {0.0,temp};
+			return arr;}
+			else if(pick == 1) {
+				List<Edge> temp = new ArrayList<Edge>();
+				Edge e =  (Edge) g.getEdge(src, fruit.getFruitEdge().getDest());
+				temp.add(e);
+				Object [] arr = {0.0,temp};
+				return arr;	
+			}
+		}
+		
+		if(pick == 0) {
+
+		List<node_data> temp = DijkstraNode(src, dest, g);
 		if(temp == null ) {
 			return null;
 		}
 
 		Object [] arr = {temp.get(temp.size()-1).getWeight(),temp};
 
-		return arr;
+		return arr;}
+		else {
+			
+			List<Edge> temp = DijkstraEdge(src, dest, g);
+			if(temp == null ) {
+				return null;
+			}
+			Object [] arr = {g.getNode(temp.get(temp.size()-1).getDest()).getWeight(),temp};
+			return arr;	
+		}
 	}
+
+
+
+
+
 	/**
 	 * 
 	 * Tsp: 
@@ -379,12 +503,12 @@ public class Graph_Algo implements graph_algorithms{
 	 * will compute the shortest path.  
 	 * @return the 'shortest' path. 
 	 */
-	@Override
-	public List<node_data> TSP(List<Integer> targets) {
+
+	static public List<node_data> TSP(List<Integer> targets, DGraph g) {
 
 		if(targets==null) {System.out.println("No targets Entered..");return null;}
 		targets=removeDuplicates(targets); // removing Duplicates.
-		if(!checkPathOfTargets(targets)) {return null;}
+		if(!checkPathOfTargets(targets,g)) {return null;}
 
 		targets=removeDuplicates(targets); // removing Duplicates. 
 
@@ -396,10 +520,10 @@ public class Graph_Algo implements graph_algorithms{
 		ArrayList<node_data> ans = new ArrayList<node_data>();  //will hold the shortest path. 
 		for (int i = 0; i < 64; i++) {  // how many checks. 
 			arr = new ArrayList<node_data>();
-			List<Integer> tmp = shuffleTargets(targets); //shuffle the targets list. 
+			List<Integer> tmp = shuffleTargets(targets,g); //shuffle the targets list. 
 			min_path_temp =0;							//setting the min path temp to hold the current path cost; 
 			for (int j = 0; j < targets.size()-1; j++) {	//go over all the targets and try to create path ti-->ti+1; 
-				arr_temp = shortestPath_Dist(tmp.get(j),tmp.get(j+1));
+				arr_temp = shortestPath_Dist(tmp.get(j),tmp.get(j+1),g,null,0);
 				if(arr_temp==null) { // if there is no path; 
 					min_path_temp = -1;
 					j=targets.size(); 
@@ -432,15 +556,15 @@ public class Graph_Algo implements graph_algorithms{
 	 * @param targets
 	 * @return if the targets subgraph is strongly connected.
 	 */
-	private boolean checkPathOfTargets(List<Integer> targets) {
+	static private boolean checkPathOfTargets(List<Integer> targets,DGraph g) {
 		Collection<node_data> t_check = new ArrayList<node_data>();
 		try {
 			for (int i = 0; i < targets.size(); i++) {
-				t_check.add(this.g.getNode(targets.get(i))); }
+				t_check.add(g.getNode(targets.get(i))); }
 		}catch (Exception e) {
 			return false;
 		}
-		if(BFS(t_check)) {return true;}
+		if(BFS(t_check, g)) {return true;}
 
 		return false;
 	}
@@ -449,7 +573,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * @param targets
 	 * @return rearrange form of targets
 	 */
-	private List<Integer> shuffleTargets(List<Integer> targets) {
+	static private List<Integer> shuffleTargets(List<Integer> targets,DGraph g) {
 
 		int t1 = new Random().nextInt(targets.size()-1);
 		int t2 = new Random().nextInt(targets.size()-1);
@@ -475,38 +599,8 @@ public class Graph_Algo implements graph_algorithms{
 
 		return targets;
 	}
-	/**
-	 * Deep copy method of graph.
-	 */
-	@Override
-	public graph copy() {
-		if(g==null) {return null;}
-		graph new_g = new DGraph();
 
-		Collection<node_data> v = g.getV();
-		Iterator v_it = v.iterator();
-		while(v_it.hasNext()) {	
-			node_data new_v = (node_data)v_it.next();
-			new_g.addNode(new_v);
-
-		}
-
-
-		while(v_it.hasNext()) {	
-			node_data new_v = (node_data)v_it.next();
-
-			Collection<edge_data> e = g.getE(new_v.getKey());
-			Iterator e_it = e.iterator();
-
-			while (e_it.hasNext()) {
-				edge_data new_e = (edge_data) e_it.next();
-				new_g.connect(new_e.getSrc(), new_e.getDest(), new_e.getWeight());
-			}
-		}
-
-		return new_g;
-	}
-	public ArrayList<Integer> removeDuplicates(List<Integer> list) 
+	static public ArrayList<Integer> removeDuplicates(List<Integer> list) 
 	{ 
 
 		// Create a new ArrayList 
@@ -527,7 +621,7 @@ public class Graph_Algo implements graph_algorithms{
 		return newList; 
 	} 
 
-	private boolean dosecontain(int src, int dest, Collection<node_data> vertex) {
+	static private boolean dosecontain(int src, int dest, Collection<node_data> vertex) {
 
 		Iterator hit = vertex.iterator();
 		boolean a=false; boolean b=false; 
@@ -545,28 +639,52 @@ public class Graph_Algo implements graph_algorithms{
 
 	}
 
-	private double CalcLen(double x1, double x2, double y1,double y2) {
+	private static double CalcLen(double x1, double x2, double y1,double y2) {
 		//d=((x1-x2)^2+(y1-y2)^2)
 		return Math.sqrt(Math.pow((x1-x2),2)+Math.pow((y1-y2),2));
 	}
-	
-//	public boolean isOn(double x, double y, double type) {
-//		
-//	
-//		
-//		if(src.getKey() < dest.getKey() &&  type == -1) {
-//			return false;
-//		}else if(src.getKey() > dest.getKey() &&  type == 1) {
-//			return false;
-//		}
-//
-//		if((CalcLen(x, x1, y, y1)+CalcLen(x, x2, y, y2)) <= this.length+EPS 
-//				&&(CalcLen(x, x1, y, y1)+CalcLen(x, x2, y, y2)) >= this.length-EPS)
-//		{
-//			return true;
-//		}
-//		return false;
-//	} 
+
+	public static Edge EdgeForFruit(DGraph gg, Point3D fruit_pos, double type) {
+
+		Iterator hit = gg.getV().iterator();
+		while(hit.hasNext()) {
+
+			node_data v = (node_data) hit.next(); 
+			Collection<edge_data> edges = gg.getE(v.getKey());
+			if(edges == null) {continue;}
+
+			Iterator hit2 = edges.iterator();
+
+			while(hit2.hasNext()) {
+				Edge dest = (Edge) hit2.next();
+				if(isOn(dest,fruit_pos,type)) {
+					return dest;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public static boolean isOn(Edge dest ,Point3D fruit_pos, double type) {
+
+		if(dest.getSrcNode().getKey() < dest.getDestNode().getKey() &&  type == -1) {
+			return false;
+		}else if(dest.getSrcNode().getKey() > dest.getDestNode().getKey() &&  type == 1) {
+			return false;
+		}
+
+		double x1 = dest.getSrcNode().getLocation().x(); double y1 = dest.getSrcNode().getLocation().y();
+		double x2 = dest.getDestNode().getLocation().x(); double y2 = dest.getDestNode().getLocation().y();
+		double x = fruit_pos.x(); double y = fruit_pos.y();
+
+		if((CalcLen(x, x1, y, y1)+CalcLen(x, x2, y, y2)) <= dest.getlength()+EPS 
+				&&(CalcLen(x, x1, y, y1)+CalcLen(x, x2, y, y2)) >= dest.getlength()-EPS)
+		{
+			return true;
+		}
+		return false;
+	}
 
 
 
@@ -584,7 +702,7 @@ public class Graph_Algo implements graph_algorithms{
 	 * 
 	 */
 
-	private class MinHeap{
+	static private class MinHeap{
 
 		////////////////////////////////////////////
 		//////////////    fields     ///////////////
@@ -721,6 +839,7 @@ public class Graph_Algo implements graph_algorithms{
 			return heap.isEmpty();
 		}
 	}
+
 
 
 

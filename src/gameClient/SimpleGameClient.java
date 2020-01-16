@@ -1,42 +1,28 @@
 package gameClient;
 
-import java.awt.Color;
-import java.awt.FileDialog;
+import elements.*;
 import java.awt.Frame;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Queue;
-import java.util.Set;
 import java.util.StringTokenizer;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import Gui.GUI;
 import Server.Game_Server;
 import Server.game_service;
 import algorithms.Graph_Algo;
 import dataStructure.DGraph;
-import dataStructure.edge_data;
-import dataStructure.graph;
 import dataStructure.node_data;
 import elements.Edge;
-import oop_dataStructure.OOP_DGraph;
-import oop_dataStructure.oop_edge_data;
-import oop_dataStructure.oop_graph;
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
+import elements.Fruit_Basket;
+
 /**
  * This class represents a simple example for using the GameServer API:
  * the main file performs the following tasks:
@@ -55,683 +41,380 @@ import sun.audio.AudioStream;
  *
  */
 public class SimpleGameClient extends Observable implements Runnable {
-	
+
 	public static void test1() {
-		JFrame frame = null; 
-
-		String temp1; int Level_chooser = 0; int GameType_chooser = 0; 	boolean flag = true;
 
 
-		//Choose Game Type : Auto or Menual\\ 
-		while(flag) {
-			try {	
-				String Menual_Or_Auto = JOptionPane.showInputDialog(frame,"Enter 1 to Menual || Enter 2 to Auto ");
-				if(Menual_Or_Auto.matches("1")||Menual_Or_Auto.matches("2")) { GameType_chooser =Integer.parseInt(Menual_Or_Auto);	flag =false;}
-			}catch (Exception e) {}
-		}flag =true;
+		//////////////////////Variables hold the game setting////////////////////////// 
+		JFrame frame = null; int Level_chooser = 0; int GameType_chooser = 0;
 
-		//Choose level\\
-		while(flag) {
-			try {	
-				temp1 = JOptionPane.showInputDialog(frame,"Enter Level ");
-				if(temp1.matches("\\d+")) { Level_chooser =Integer.parseInt(temp1);flag =false;	}
-			}catch (Exception e) {}
-		}flag =true;
+		/////////////////////Choose Game Type : Auto or Manual////////////////////////
+		Object[] possibilities1 = {"Automatic" , "Menual"};
+		String s1 =  (String)JOptionPane.showInputDialog(frame,"Play automatic or Menual","Auto or Menual", JOptionPane.PLAIN_MESSAGE,null ,possibilities1,  "");
+		if(s1 == "Automatic") {GameType_chooser  = 0 ; }
+		if(s1 == "Menual")    {GameType_chooser  = 1 ; }
 
-		game_service game = Game_Server.getServer(Level_chooser); // you have [0,23] games this will pick what lvl we will play from the server
+		///////////////////////////////Choose level//////////////////////////////////
+		Object[] possibilities2 = {"0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
+		String s2 = (String)JOptionPane.showInputDialog(frame,"pick game","Choose Game Level:", JOptionPane.PLAIN_MESSAGE,null ,possibilities2,  "");
+		Level_chooser =Integer.parseInt(s2);	
 
-		String graph_string = game.getGraph(); // game.get grapf will bring me a json of the graph that I can place in a string 
 
-		DGraph dgraph = new DGraph();
+		game_service game = Game_Server.getServer(Level_chooser); //peek the level from server. 
+
+		String graph_string = game.getGraph();					 //Getting the level map(graph). 
+
+		/////////////////////////////initializing the graph//////////////////////////
+		DGraph dgraph = new DGraph();							
 		dgraph.init(graph_string);
 		dgraph.EdgeInitTag();
-		
-		
-		String info = game.toString();
+
+		String info = game.toString();							//getting all the Level information from the server.(string)
+
+
+
+
+		////////////////////////////Loading the information from the Json String given by the server/////////////////////////////
 		JSONObject line;
-		try {
+		
+		initRobots(game,dgraph);
+		
 
-			line = new JSONObject(info);
-			JSONObject ttt = line.getJSONObject("GameServer");
-			int rs = ttt.getInt("robots");
-			System.out.println(info);
-			System.out.println(graph_string);
-			// the list of fruits should be considered in your solution
-			Iterator<String> f_iter = game.getFruits().iterator();
-			while(f_iter.hasNext()) {System.out.println(f_iter.next());}	
-			int src_node = 0;  // arbitrary node, you should start at one of the fruits
-			for(int a = 0;a<rs;a++) {
-				// will get an ID of node and place a robot on it.
-				game.addRobot(src_node+a);
-			}
-		}
-		catch (JSONException e) {e.printStackTrace();}
-
-
+		////Open a manual Game/////
 		if(GameType_chooser == 1) {
 			playMenual(dgraph,game); 
-			
-		}else {
+			//game is running...
+		}
+
+
+		////Open a Automatic Game/////
+		else {
+
 			PlayAuto(dgraph,game);
+			//game is running...
 		}
-		
-		String results = game.toString();
-		System.out.println("Game Over: "+results);
-	}
 
-	private static void PlayAuto(DGraph dgraph, game_service game) {
-		
-		
-		GUI gui = new GUI(dgraph,game,0);
-		gui.setVisible(true);
-		
-		
-		game.startGame();
-		
-		int ind = 30; 
-		int delay = 18;
-		long first = System.currentTimeMillis();
-		while(game.isRunning()) { // while there is more time in the game
-			moveRobots(game, dgraph);
-		try {
-				
-				if(ind%4 == 0) { gui.repaint();}
-				ind++;
-				Thread.sleep(delay);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+
+			//Print the Game results//
+			String results = game.toString();
+			System.out.println("Game Over: "+results);
+		}
+
+		static private void initRobots(game_service game, DGraph gg) {
+
+			String graph_string = game.getGraph();
+			String info = game.toString();
+			JSONObject line;
+			try {
+
+				line = new JSONObject(info);
+				JSONObject ttt = line.getJSONObject("GameServer");
+				int rs = ttt.getInt("robots");
+				System.out.println(info);
+				System.out.println(graph_string);
+				// the list of fruits should be considered in your solution
+				Iterator<String> f_iter = game.getFruits().iterator();
+
+				fruits = new Fruit_Basket(game, gg);
+				robots_list = new ArrayList<robot>();		 //creating the list of the robots.
+
+				Fruit_Basket temp = new Fruit_Basket(game, gg);
+
+				while(f_iter.hasNext()) {System.out.println(f_iter.next());}	
+				int src_node = 0;  // arbitrary node, you should start at one of the fruits
+
+				for(int a = 0;a<rs;a++) {
+					// will get an ID of node and place a robot on it.
+					int src = temp.getMax().getFruitEdge().getSrc();
+					game.addRobot(src);
+					robots_list.add(new robot(a));
+					final_dest_len.add(Double.MAX_VALUE);
+
+				}
+			}		catch (JSONException e) {e.printStackTrace();}	
+
+		}
+
+
+
+
+		static Fruit_Basket fruits;
+		static ArrayList<robot> robots_list;
+		static HashMap<Integer, Queue<Edge>> robot_final_dest1 = new HashMap<Integer, Queue<Edge>>();
+		static HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
+		static ArrayList<Double> final_dest_len = new ArrayList<Double>();
+		static boolean flag = true;
+
+		/**
+		 * Main Method of the automatic game:
+		 * 
+		 * will play the game using algorithm for best score. 
+		 * @param dgraph -the game graph.
+		 * @param game 	 -game server.
+		 */
+		private static void PlayAuto(DGraph dgraph, game_service game) {
+
+			//Open the Game window display (GUI)
+			GUI gui = new GUI(dgraph,game,0);
+			gui.setVisible(true);
+
+			game.startGame();			 // Commend the game server to start the game. 
+
+			int ind = 30; 		int delay = 0;
+			long first = System.currentTimeMillis();
+			while(  game.timeToEnd()/1000!=0) { //   game.isRunning()) { 
+
+				new_moveRobots(game, dgraph);
+
+				gui.repaint();
+				if(System.currentTimeMillis() - first >= 10000){
+					first = System.currentTimeMillis();
+				}
+
+
 			}
-			
-			if(System.currentTimeMillis() - first >= 10000){
-				first = System.currentTimeMillis();
-			}
-			
-			
+
 		}
 
-	}
-	
-	
-	
-	private static void playMenual(DGraph dgraph, game_service game) {
-		GUI gui = new GUI(dgraph,game,1);
-		gui.setVisible(true);
-		game.startGame();
-		long t = game.timeToEnd();
-		while(game.isRunning()) { // while there is more time in the game
-			moveRobotsM(game,dgraph);
-			gui.repaint();
-		}
+		/**
+		 * in charge of setting all the information of the robots in the game. 
+		 * @param game
+		 * @param gg
+		 */
+		static private void updateRobots(game_service game, DGraph gg) {
 
-	}
-	static HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
+			List<String> log = game.move();		 // getting the game log information. 
 
-	static private void moveRobotsM(game_service game, DGraph gg) {
-		Graph_Algo ga = new Graph_Algo(gg);
-		List<String> log = game.move();
-		if(log!=null) {
-			long t = game.timeToEnd();
-			for(int i=0;i<log.size();i++) {
+			String info = game.toString();		// getting the game information from the server. 
+			JSONObject sline;
 
-				String robot_json = log.get(i);
+			//extract the number of the robots in the game. 
+			int numberOfRobots = 0;
+			try {sline = new JSONObject(info);
+			JSONObject tttt = sline.getJSONObject("GameServer");
+			numberOfRobots = tttt.getInt("robots"); //tell me how many robots there are in the game. 
+			} catch (JSONException e1) {}
+
+			//extract the robots meta data from the server.
+			for(int i=0;i<numberOfRobots;i++) {
+				String robot_json = log.get(i); // get the i'th robot string. 
 
 				try {
-					JSONObject line = new JSONObject(robot_json);
+					JSONObject line = new JSONObject(robot_json); // hold the specific robot from the string robot arr.
 					JSONObject ttt = line.getJSONObject("Robot");
-					int rid = ttt.getInt("id");
-					int src = ttt.getInt("src");
-					int dest = ttt.getInt("dest");
+					//getting the robot info//
+					int rid 		= ttt.getInt("id"); 			//robot unique Id	
+					int src 		= ttt.getInt("src");			//robot source vertex Id
+					int dest 		= ttt.getInt("dest");			//robot destination vertex ID 
+					double speed 	= ttt.getDouble("speed");		//robot current speed
 
-					if(!robot_final_dest.containsKey(src)) {
-						robot_final_dest.put(src, null);
+					//robot x,y coordinates// 
+					String pos 		= ttt.getString("pos");		
+					StringTokenizer st1 = new StringTokenizer(pos, ","); 
+
+					double x 		= Double.parseDouble(st1.nextToken()); //robot x location
+					double y 		= Double.parseDouble(st1.nextToken()); //robot y location
+
+					boolean flag = true;
+
+					//--> update the robot fields.
+					robots_list.get(i).setDest(dest);
+					robots_list.get(i).setSrc(src);
+					robots_list.get(i).setSpeed(speed);
+
+					if(robots_list.get(i).getPath() != null) {
+						//--> update the robot local path
+						if(robots_list.get(i).robot_Heap_Get_PathLen() < robot_final_dest1.get(i).peek().getWeight()) {
+							//need to be updated.
+							for (int j = 0; j < robot_final_dest1.get(i).size(); j++) {
+
+							} 
+
+						}
+					}
+
+					//update the local path of the robot. 
+					if(!robot_final_dest1.containsKey(robots_list.get(i).getId())) {
+						robot_final_dest1.put(robots_list.get(i).getId(), null);
 					}
 
 				}catch (Exception e) {}
 			}
-
-			for(int i=0;i<log.size();i++) {
-				String robot_json = log.get(i);
-				try {
-					JSONObject line = new JSONObject(robot_json);
-					JSONObject ttt = line.getJSONObject("Robot");
-					int rid = ttt.getInt("id");
-					int src = ttt.getInt("src");
-					int dest = ttt.getInt("dest");
-
-					if(dest == -1 && robot_final_dest.get(rid) == null ) {
-
-						boolean flag = true; Frame frame = null; int d_choosen =-1;
-						while (flag==true) {
-							try {
-								String temp1= JOptionPane.showInputDialog(frame,"Enter Dest ID for ROBOT"+rid);
-								if(temp1.matches("\\d+")) {
-									d_choosen =Integer.parseInt(temp1);	
-									if(gg.getNode(d_choosen)!=null && d_choosen!=src) {flag=false; continue;}
-								}	System.out.println("dest Not Valid");
-
-							}catch (Exception e) {}flag =true;
-
-								
-						}
-						Queue<node_data> q = new LinkedList<node_data>(ga.shortestPath(src, d_choosen));
-
-						robot_final_dest.put(rid,q);	
-					}
-
-					if(dest==-1 && robot_final_dest.get(rid) != null && robot_final_dest.get(rid).size() != 0 ) {
-
-						dest = robot_final_dest.get(rid).remove().getKey();
-						if(robot_final_dest.get(rid).size()==0) {
-							robot_final_dest.put(rid,null);
-						}
-
-						game.chooseNextEdge(rid, dest);
-						System.out.println(ttt);
-						System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
-
-					}
-				} 
-				catch (JSONException e) {e.printStackTrace();}
-			}
 		}
 
-	}
 
+		static private void new_moveRobots(game_service game, DGraph gg) {
 
+			List<String> log = game.move();
 
-	/** 
-	 * Moves each of the robots along the edge, 
-	 * in case the robot is on a node the next destination (next edge) is chosen (randomly).
-	 * @param game
-	 * @param gg
-	 * @param log
-	 */
+			if(log!=null) {
 
-	static private void moveRobots(game_service game, DGraph gg) {
-		
-		
-		HashMap<Integer, Queue<node_data>> robot_final = robot_final_dest;
-		List<String> log = game.move();
-		if(log!=null) {
+				long t = game.timeToEnd();
 
-			long t = game.timeToEnd();
+				fruits= new Fruit_Basket(game, gg);
+				updateRobots(game,gg);
 
-			List<String> Fruit = game.getFruits();
-			ArrayList<Edge> fruit_edges = new ArrayList<Edge>();
+				Fruit_Basket f = fruits;
+				ArrayList<robot> r=  robots_list;
+				// --> update robot heap
+				for (int i = 0; i < robots_list.size(); i++) {
+					robots_list.get(i).cleanHeap();
+					for (int j = 0; j < fruits.getLen(); j++) {	
 
-			for (int j = 0; j < Fruit.size(); j++) {
-				try {
-					JSONObject obj = new JSONObject(Fruit.get(j));
-					JSONObject ff = obj.getJSONObject("Fruit");
-					double value = ff.getDouble("value");
-					double type = ff.getDouble("type");
-					String pos = ff.getString("pos");
-					StringTokenizer st1 = new StringTokenizer(pos, ","); 
-					double x = Double.parseDouble(st1.nextToken());
-					double y = Double.parseDouble(st1.nextToken());
+						Object[] a = Graph_Algo.shortestPath_Dist(robots_list.get(i).getSrc(),fruits.getFruit(j).getFruitEdge().getSrc(),gg,fruits.getFruit(j),1);
 
-					Iterator hit = gg.getV().iterator();
-					while(hit.hasNext()) {
+						robots_list.get(i).addHeap(a,fruits.getFruit(j));
+					}
+				}
 
-						node_data v = (node_data) hit.next(); 
-						Collection<edge_data> edges = gg.getE(v.getKey());
-						if(edges == null) {continue;}
+				for (int i = 0; i < robots_list.size(); i++) {
 
-						Iterator hit2 = edges.iterator();
+					for (int j = 0; j < robots_list.size(); j++) {
+						if(i == j) continue;//same robot
+						else if(robots_list.get(i).getFruit() == robots_list.get(j).getFruit()) {
 
-						while(hit2.hasNext()) {
-							Edge dest = (Edge) hit2.next();
-							if(dest.isOn(x, y,type)) {
-								fruit_edges.add(dest);
+							//-->same value of paths (choose random)
+							if(robots_list.get(i).getPath_len() == robots_list.get(j).getPath_len()) {
+								robots_list.get(j).robot_Heap_pop();
+							}
+							//
+							else if (robots_list.get(i).getPath_len() < robots_list.get(j).getPath_len()) {
+								robots_list.get(j).robot_Heap_pop();
+							}
+							else if (robots_list.get(i).getPath_len() > robots_list.get(j).getPath_len()) {
+								robots_list.get(i).robot_Heap_pop();
+
+								i=-1; j= robots_list.size(); continue;
 							}
 						}
-					}
-				} catch (JSONException e) {e.printStackTrace();}
 
-			}
-
-
-			for(int i=0;i<log.size();i++) {
-
-				String robot_json = log.get(i);
-
-				try {
-					JSONObject line = new JSONObject(robot_json);
-					JSONObject ttt = line.getJSONObject("Robot");
-					int rid = ttt.getInt("id");
-					int src = ttt.getInt("src");
-					int dest = ttt.getInt("dest");
-
-					if(!robot_final_dest.containsKey(src)) {
-						robot_final_dest.put(src, null);
 					}
 
-				}catch (Exception e) {}
+				}
+
+				for (int i = 0; i < robots_list.size(); i++) {
+
+					if(robot_final_dest1.get(i)== null) {			
+						Queue<Edge> temp =  new LinkedList<Edge>(robots_list.get(i).getrobot_Heap().peek().getPath());
+						robot_final_dest1.put(i,temp );
+						final_dest_len.set(i,robots_list.get(i).getrobot_Heap().peek().getPathDist());
+
+					}
+					else if(final_dest_len.get(i)> robots_list.get(i).getrobot_Heap().peek().getPathDist()){			
+						Queue<Edge> temp =  new LinkedList<Edge>(robots_list.get(i).getrobot_Heap().peek().getPath());
+						robot_final_dest1.put(i,temp);
+						final_dest_len.set(i,robots_list.get(i).getrobot_Heap().peek().getPathDist());
+					}
+
+				}
+				HashMap<Integer, Queue<Edge>>robot_final = robot_final_dest1;
+
+				for (int i = 0; i < robots_list.size(); i++) {
+
+					if(robots_list.get(i).getDest() ==-1) {
+
+						Edge e = robot_final_dest1.get(i).remove();
+						if(robot_final_dest1.get(i).size() == 0) {
+							robot_final_dest1.put(i, null);
+						}
+						double temp = final_dest_len.get(i);
+						final_dest_len.set(i, temp-e.getWeight());
+						int id_src = e.getSrc();
+						int id_dest = e.getDest();
+						System.out.println(id_src+" "+id_dest);
+						game.chooseNextEdge(robots_list.get(i).getId(), id_dest);
+						System.out.println(game.timeToEnd()/1000);
+
+					}
+				}	
+			}
+		}
+
+
+		private static void playMenual(DGraph dgraph, game_service game) {
+			GUI gui = new GUI(dgraph,game,1);
+			gui.setVisible(true);
+			game.startGame();
+
+			long t = game.timeToEnd();
+			while(game.isRunning()) { // while there is more time in the game
+				moveRobotsM(game,dgraph);
+				gui.repaint();
 			}
 
+		}
 
-			Object [] min_path = null;
-			Graph_Algo ga = new Graph_Algo();
-			ga.init(gg);
-			int id = 0;
 
-			for(int j=0; j<fruit_edges.size();j++) {
 
-				min_path = null;
+
+		static private void moveRobotsM(game_service game, DGraph gg) {
+
+			List<String> log = game.move();
+			Frame frame = null; 
+			int d_choosen = -1;
+			if(log!=null) {
+
+				updateRobots(game,gg);
+
 				for(int i=0;i<log.size();i++) {
+					if(!robot_final_dest1.containsKey(i)) {
+						robot_final_dest1.put(i, null);
+					}
 
-					String robot_json = log.get(i);
+				}
 
-					try {
-						JSONObject line = new JSONObject(robot_json);
-						JSONObject ttt = line.getJSONObject("Robot");
-						int rid = ttt.getInt("id");
-						int src = ttt.getInt("src");
-						int dest = ttt.getInt("dest");
+				for (int i = 0; i < robots_list.size(); i++) {
+
+					if(robot_final_dest.get(i)==null) {
+
+						while (flag==true) {
+							try {
+								String temp1= JOptionPane.showInputDialog(frame,"Enter Dest ID for ROBOT "+i);
+								if(temp1.matches("\\d+")) {
+									d_choosen =Integer.parseInt(temp1);	
+									if(gg.getNode(d_choosen)!=null) {flag=false; continue;}
+								}	System.out.println("dest Not Valid");
+							}catch (Exception e) {}		
+						}flag=true;
+
+						List<node_data> temp = Graph_Algo.shortestPath(robots_list.get(i).getSrc(), d_choosen, gg);
+						Queue<node_data> e = new LinkedList<node_data>(temp);
+						e.remove();
+						e.add(gg.getNode(d_choosen));
+						robot_final_dest.put(i, e);
+					}
+				}
+
+				for (int i = 0; i < robots_list.size(); i++) {
+
+					if(robots_list.get(i).getDest() ==-1) {
+
+						node_data e = robot_final_dest.get(i).remove();
 						
+						if(robot_final_dest.get(i).size() == 0) {
+							robot_final_dest.put(i, null);
+						}
+						
+						double temp = final_dest_len.get(i);
 					
-						if(robot_final_dest.get(rid) != null) {continue;}
-
-						Object [] temp_path = ga.shortestPath_Dist(src, fruit_edges.get(j).getSrc());
-
-						if(min_path == null && temp_path != null) {
-							min_path = temp_path;
-							id =rid;
-						}else if(src == fruit_edges.get(j).getSrc()) {
-
-							min_path[0] = fruit_edges.get(j).getWeight();
-							List<node_data> temp = new LinkedList<node_data>();
-							temp.add( gg.getNode(fruit_edges.get(j).getSrc()));
-							min_path[1] =  temp;
-
-						}
-						else if((double)min_path[0] > (double)temp_path[0]) {
-							min_path = temp_path;
-							id =rid;
-						}
-					}
-					catch (JSONException e) {e.printStackTrace();}
-				}
-
-				if(min_path == null) {continue;}
-
-				Queue<node_data> q = new LinkedList<node_data>((List<node_data>) min_path[1]);
-				q.remove();
-				q.add(gg.getNode(fruit_edges.get(j).getDest()));
-				robot_final_dest.put(id, q);
-			}
-
-			for(int i=0;i<log.size();i++) {
-				String robot_json = log.get(i);
-				try {
-					JSONObject line = new JSONObject(robot_json);
-					JSONObject ttt = line.getJSONObject("Robot");
-					int rid = ttt.getInt("id");
-					int src = ttt.getInt("src");
-					int dest = ttt.getInt("dest");
-
-					if(dest==-1 && robot_final_dest.get(rid) != null &&robot_final_dest.get(rid).size() != 0 ) {
-
-						dest = robot_final_dest.get(rid).remove().getKey();
-						if(robot_final_dest.get(rid).size()==0) {
-							robot_final_dest.put(rid,null);
-							System.out.println(src+" "+dest);
-						}
-						
-						game.chooseNextEdge(rid, dest);
-						System.out.println(ttt);
-						System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
-						
-					}
-				} 
-				catch (JSONException e) {e.printStackTrace();}
-			}
-
-
-		}
-	}
-	/**
-	 * a very simple random walk implementation!
-	 * @param g
-	 * @param src
-	 * @return
-	 */
-	private static int nextNode(DGraph g, int src) {
-		int ans = -1;
-		Collection<edge_data> ee = g.getE(src);
-		Iterator<edge_data> itr = ee.iterator();
-		int s = ee.size();
-		int r = (int)(Math.random()*s);
-		int i=0;
-		while(i<r) {itr.next();i++;}
-		ans = itr.next().getDest();
-		return ans;
-
-	}
-
-	static private ArrayList<edge_data> fruit_edges = new ArrayList<edge_data>();
-
-
-	static private void get_fruit_edges(DGraph g, game_service game) {
-
-		List<String> Fruit = game.getFruits();
-
-		for (int j = 0; j < Fruit.size(); j++) {
-			try {
-				JSONObject obj = new JSONObject(Fruit.get(j));
-				JSONObject ff = obj.getJSONObject("Fruit");
-				double value = ff.getDouble("value");
-				double type = ff.getDouble("type");
-				String pos = ff.getString("pos");
-				StringTokenizer st1 = new StringTokenizer(pos, ","); 
-				double x = Double.parseDouble(st1.nextToken());
-				double y = Double.parseDouble(st1.nextToken());
-
-				Iterator hit = g.getV().iterator();
-				while(hit.hasNext()) {
-
-
-					node_data v = (node_data) hit.next(); 
-
-
-					Collection<edge_data> edges = g.getE(v.getKey());
-					if(edges == null) {continue;}
-
-
-					Iterator hit2 = edges.iterator();
-
-					while(hit2.hasNext()) {
-
-						Edge dest = (Edge) hit2.next();
-						if(dest.isOn(x, y,type)) {
-							fruit_edges.add(dest);
-						}
+						game.chooseNextEdge(robots_list.get(i).getId(), e.getKey());
+						System.out.println(game.timeToEnd()/1000);
 					}
 				}
 
 
-			} catch (JSONException e) {e.printStackTrace();}
-
-		}
-
-	}
-
-
-	static private HashMap<Integer, MinHeap> robot_edges = new HashMap<Integer, SimpleGameClient.MinHeap>();
-
-
-	static private void robot_edges(DGraph g, game_service game) {
-
-
-		Graph_Algo ga = new Graph_Algo();
-		ga.init(g);
-		List<String> ArnoldSchwarzenegge = game.getRobots();
-		for (int j = 0; j < ArnoldSchwarzenegge.size(); j++) {
-
-			try {
-
-				JSONObject obj = new JSONObject(ArnoldSchwarzenegge.get(j));
-				JSONObject ff = obj.getJSONObject("Robot");
-				int src = ff.getInt("src");
-
-				MinHeap temp = new MinHeap();
-				for (int i = 0; i < fruit_edges.size(); i++) {
-					temp.add(fruit_edges.get(i), ga.shortestPath_Dist(src,fruit_edges.get(i).getSrc()));
-				}
-
-				robot_edges.put(src, temp);
-
-			} catch (JSONException e) {e.printStackTrace();}
-
-
-		}
-
-	}
-
-
-	static private void PickAmove(DGraph g, game_service game) {
-
-		Set setofrobos = robot_edges.keySet();
-		Iterator hit = setofrobos.iterator();
-		List<String> robo_list = game.getRobots();
-		int i =0;
-		int j =0;
-		boolean should_next = true;
-		int robot_id = 0;
-
-		while (hit.hasNext() ) {
-
-			if(should_next) {
-				robot_id = (int) hit.next();
 			}
 
-			Set setofrobos2 = robot_edges.keySet();
-			Iterator hit2 = setofrobos.iterator();
-			j=0;
-			if (robo_list.size()==1) {return;}
-			while (j != robo_list.size() && hit2.hasNext() ) {
-
-
-				int robot_id2 = (int) hit2.next();
-
-				if(robot_id == robot_id2) {continue;}
-
-				node robot_path = robot_edges.get(robot_id).peek();
-				node robot_path2 = robot_edges.get(robot_id2).peek();
-
-
-				if( robot_path.getE() == robot_path2.getE()) {
-
-					if(robot_path.getPathDist() < robot_path2.getPathDist()) {
-						robot_edges.get(robot_path2).pop();
-						j++;
-						should_next =true;
-					}else if(robot_path.getPathDist() > robot_path2.getPathDist()) {
-
-						robot_edges.get(robot_path).pop();
-						j = robo_list.size();
-						should_next =false;
-					}
-				}
-
-			}
 		}
+
+
+		@Override
+		public void run() {
+			test1();
+
+		}
+
+
 
 
 	}
-
-
-
-	static private void final_jorney(DGraph g, game_service game) {
-
-		Set setofrobos = robot_edges.keySet();
-		Iterator hit = setofrobos.iterator();
-		List<String> robo_list = game.getRobots();
-		int robot_id;
-
-		while (hit.hasNext()) {	
-			robot_id = (int) hit.next();
-
-			Queue<node_data> temp = new LinkedList<node_data>();
-			List<node_data> temp2 = robot_edges.get(robot_id).peek().getPath();
-
-			for (int i = 0; i < temp2.size(); i++) {
-				temp.add(temp2.get(i));
-			}
-
-			robot_final_dest.put(robot_id, temp);
-		}
-
-	}
-
-
-
-	static private class node{
-		edge_data e;
-		Object [] path;	
-		public node(edge_data e, Object [] path) {
-			this.e = e;
-			this.path = path;	
-		}
-
-		public double getPathDist() {
-			return (double) path[0];
-		}
-
-		public edge_data getE() {
-			return e;
-		}
-
-		public List<node_data> getPath() {
-			return (List<node_data>) path[1];
-		}
-
-	}
-
-
-
-
-	static private class MinHeap{
-
-
-
-
-		ArrayList<node> heap;
-
-		public MinHeap () {
-			heap = new ArrayList<node>();
-		}
-
-		public MinHeap (MinHeap a) {
-			heap = new ArrayList<node>();
-			ArrayList<node> temp = a.getList();
-			for (int i = 0; i < temp.size(); i++) {
-				heap.add(temp.get(i));
-			}
-		}
-
-		private ArrayList<node> getList() {
-			return heap;
-		}
-
-		public void add(edge_data e, Object [] path) {
-
-			node new_e = new node(e, path);	
-			add_heapfyup(new_e);
-		}
-
-		private void add_heapfyup(node new_e) {
-
-			heap.add(new_e);
-			int index = heap.size()-1;
-
-			while(index > 0) {
-				int parent = (index-1)/2;
-
-				if(heap.get(index).getPathDist() < heap.get(parent).getPathDist()) {
-					node temp = heap.get(parent);
-					heap.set(parent, heap.get(index));
-					heap.set(index, temp);
-					index = parent;
-				}
-				else {
-					return;
-				}
-			}
-
-		}
-
-		public node pop() {
-
-			node temp = heap.get(0);
-			heap.set(0, heap.get(heap.size()-1));
-			heap.set(heap.size()-1, temp);
-			node pop = heap.remove(heap.size()-1);
-			heapfy_down();
-			return pop;
-		}
-
-		private void swap(int a ,int b) {
-			node temp = heap.get(a);
-			heap.set(a, heap.get(b));
-			heap.set(b, temp);
-		}
-
-		private void heapfy_down() {
-
-			int right 		=2;
-			int left 		=1;
-			int movingindex =0;
-			int end 		=heap.size()-1; 
-
-
-			while(movingindex != end && right < end && left < end) {
-
-				if(heap.get(movingindex).getPathDist() > heap.get(left).getPathDist())
-				{
-					if(heap.get(left).getPathDist() < heap.get(right).getPathDist())
-					{
-						swap(movingindex,left);
-						movingindex = left; 
-						left = (movingindex*2)+1;
-						right= (movingindex*2)+2;
-					}
-					else if(heap.get(right).getPathDist() < heap.get(left).getPathDist())
-					{
-						swap(movingindex,right);
-						movingindex = right; 
-						left = (movingindex*2)+1;
-						right= (movingindex*2)+2;
-					}
-					else 
-					{
-						swap(movingindex,left);
-						movingindex = left; 
-						left = (movingindex*2)+1;
-						right= (movingindex*2)+2;
-					}
-
-				} else return; 
-			}
-
-			if(left<end) 
-			{
-				if(heap.get(left).getPathDist() < heap.get(movingindex).getPathDist())
-				{swap(movingindex,left);}
-			}
-		}
-
-		public String toString() {
-			String print = "[";
-			for (int i = 0; i <heap.size(); i++) {
-				print+=heap.get(i).path;
-				if(i != heap.size()-1) {
-					print+=",";
-				}
-			}
-			print+="]";
-			return print;
-		}
-
-		public boolean isEmpty() {
-			return heap.isEmpty();
-		}
-
-		public node peek() {
-			return heap.get(0);
-		}
-	}
-
-
-
-
-	@Override
-	public void run() {
-		test1();
-		
-	}
-
-
-
-
-}

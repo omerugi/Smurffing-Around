@@ -68,6 +68,23 @@ public class Edge implements edge_data, Serializable{
 	public int getDest() {
 		return this.dest.getKey();
 	}
+	
+	public node_data getSrcNode() {
+		return this.src;
+	}
+	/**
+	 * Will return the dest of the edge.
+	 */
+	
+	public node_data getDestNode() {
+		return this.dest;
+	}
+	
+	public double getlength() {
+		return this.length;
+	}
+	
+	
 	/**
 	 * Will return the weight of the edge.
 	 */

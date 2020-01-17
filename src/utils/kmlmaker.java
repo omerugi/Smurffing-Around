@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -130,11 +131,9 @@ public class kmlmaker {
 		
 		try {
 			
-			FileOutputStream file = new FileOutputStream(file_name);
-			ObjectOutputStream out = new ObjectOutputStream(file);
-			
-			out.writeChars(this.game_kml.toString());
-			out.close();
+			PrintWriter w = new PrintWriter(file_name);
+			w.println(game_kml.toString());
+			w.close();
 			System.out.println("File saved");
 			
 		} catch (Exception e) {

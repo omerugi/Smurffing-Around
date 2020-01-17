@@ -191,10 +191,10 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		
 		
 		
-		ImageIcon snoop = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\snoop2.gif");
-		Image  snoop1  = snoop.getImage();
-		g2_comp.drawImage(snoop1, 350 ,100,1200,1000, this);
-		
+//		ImageIcon snoop = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\snoop2.gif");
+//		Image  snoop1  = snoop.getImage();
+//		g2_comp.drawImage(snoop1, 350 ,100,1200,1000, this);
+//		
 		paintsmurfs(g2_comp);
 	
 		paintrobotsAuto(g2_comp);

@@ -22,6 +22,7 @@ import dataStructure.DGraph;
 import dataStructure.node_data;
 import elements.Edge;
 import elements.Fruit_Basket;
+import utils.kmlmaker;
 
 /**
  * This class represents a simple example for using the GameServer API:
@@ -70,7 +71,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 		dgraph.EdgeInitTag();
 
 		String info = game.toString();							//getting all the Level information from the server.(string)
-
+		
 
 
 
@@ -78,7 +79,8 @@ public class SimpleGameClient extends Observable implements Runnable {
 		JSONObject line;
 		
 		initRobots(game,dgraph);
-		
+		kmlmaker kml = new kmlmaker(dgraph,game);
+		kml.save_kml("test.kml");
 
 		////Open a manual Game/////
 		if(GameType_chooser == 1) {

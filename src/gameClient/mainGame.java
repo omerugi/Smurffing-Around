@@ -1,4 +1,4 @@
-package gameClient;
+ package gameClient;
 
 public class mainGame {
 
@@ -9,7 +9,7 @@ public class mainGame {
 		//SimplePlayer play = new SimplePlayer("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\smurfs.mp3");
 		//SimplePlayer play = new SimplePlayer("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\techno.mp3");
 		//SimplePlayer play = new SimplePlayer("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\vitas.mp3");
-		SimplePlayer play = new SimplePlayer("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\dropIt.mp3");
+		SimplePlayer play = new SimplePlayer("\\OOP-Ex3\\dropIt.mp3");
 
 
 		/////////////////////////////////////////////////////////////////

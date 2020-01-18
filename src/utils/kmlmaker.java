@@ -19,24 +19,30 @@ import dataStructure.node_data;
 public class kmlmaker {
 
 	StringBuffer game_kml;
-	DGraph gg;
-	game_service game;
-
-	public kmlmaker(DGraph gg, game_service game) {
-		this.gg = gg;
-		this.game = game;
+	private static int singletone = 0;
+	private static int info = 0;
+	private static kmlmaker kml;
+		
+	private kmlmaker() {
 		game_kml = new StringBuffer();
+		kml = this;
+		singletone++;
 	}
 
-	public void add_game_set() {
+	public void add_kml(String kml_obj) {
+		if(info == 0) {def_add_info();}
+		game_kml.append(kml_obj);		
+	}
 
+	public void add_info(String info_of_path) {
+		if(info > 0 ) {return;}
 		String headline = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" + 
 				"<kml xmlns=\"http://earth.google.com/kml/2.2\">\r\n" + 
 				"  <Document>\r\n" + 
-				"    <name>Gmae path</name>\r\n" + 
+				"    <name>KML path</name>\r\n" + 
 				"    <open>1</open>\r\n" + 
 				"    <description>\r\n" + 
-				game.toString() +"\n"+ 
+				info_of_path +"\n"+ 
 				"    </description> \n"+
 				" <LookAt>\r\n" + 
 				"      <longitude>35.20734722222223</longitude>\r\n" + 
@@ -48,86 +54,46 @@ public class kmlmaker {
 				"    </LookAt>\r\n" 
 				;
 		game_kml.append(headline);
-
-		add_graph();
+		info++;
 
 	}
-
-	private void add_graph() {
-
-		Iterator hit = gg.getV().iterator();
-		StringBuffer edges_kml = new StringBuffer();
-		edges_kml.append(add_headline_edges());
-		
-		while(hit.hasNext()) {
-			node_data v = (node_data) hit.next();
-			int i=0;
-
-			add_vertex(v);
-
-			Collection<edge_data>edges = gg.getE(v.getKey());
-			if(edges == null) {continue;}
-			//go over the edges that come out of the specific vertex\\ 
-			Iterator hit2 = edges.iterator();
-
-			while(hit2.hasNext()) {
-				
-				edge_data dest = (edge_data) hit2.next();
-				edges_kml.append(add_edge(dest));
-			}
-
-
-		}
-	}
-
-	private String add_headline_edges() {
-		
-		String temp = "<Placemark>\r\n" + 
-				"		<name>Graph</name>\r\n" + 
-				"		<styleUrl>#m_ylw-pushpin</styleUrl>\r\n" + 
-				"		<LineString>\r\n" + 
-				"			<tessellate>1</tessellate>\r\n" + 
-				"			<coordinates>\n";
-		return temp;
-		
-	}
-
-	private String add_edge(edge_data e) {
-		
-		String temp = ""+
-		gg.getNode(e.getSrc()).getLocation().y()+","+gg.getNode(e.getSrc()).getLocation().x()+",0"+" "+
-		gg.getNode(e.getDest()).getLocation().y()+","+gg.getNode(e.getDest()).getLocation().x()+",0"+" "
-		;
-		return temp;
-	}
-
-	private void add_vertex(node_data v) {
-
-		String temp = " <Placemark>\r\n" + 
-				"		<name>Vertex:" +v.getKey() +"</name>\r\n" +  
-				"		<description> Graph's vertex	</description>\n"+			
-				"		<Point>\r\n" +  
-				"			<coordinates>"+v.getLocation().y() +","+v.getLocation().x()+",1</coordinates>\r\n" + 
-				"		</Point>\r\n" + 
-				"	</Placemark>\n";
-		
-		game_kml.append(temp);
-		
+	
+	private void def_add_info() {
+		String headline = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" + 
+				"<kml xmlns=\"http://earth.google.com/kml/2.2\">\r\n" + 
+				"  <Document>\r\n" + 
+				"    <name>KML path</name>\r\n" + 
+				"    <open>1</open>\r\n" + 
+				"    <description>\r\n" + 
+				"no info avilable" +"\n"+ 
+				"    </description> \n"+
+				" <LookAt>\r\n" + 
+				"      <longitude>35.20734722222223</longitude>\r\n" + 
+				"      <latitude>32.10453611111111</latitude>\r\n" + 
+				"      <altitude>0</altitude>\r\n" + 
+				"      <range>1131.110892010045</range>\r\n" + 
+				"      <tilt>0</tilt>\r\n" + 
+				"      <heading>-0.3840786059394472</heading>\r\n" + 
+				"    </LookAt>\r\n" 
+				;
+		game_kml.append(headline);
+		info++;
 	}
 	
 	private void add_end() {
 
 		String temp = "\n"+
 		"	</Document>\n"+
-		"</Kml>";
-		
+		"</kml>";
+		game_kml.append(temp);
 	}
-	
 	
 	public void save_kml(String filename) {
 		
 		String file_name = filename;
 		add_end();
+		
+		System.out.println(game_kml);
 		
 		try {
 			
@@ -136,11 +102,17 @@ public class kmlmaker {
 			w.close();
 			System.out.println("File saved");
 			
-		} catch (Exception e) {
-			System.out.println("problem");
-		}
-		
+		} catch (Exception e) {System.out.println("problem");}	
 	}
 
+	static public kmlmaker get_kmlmaker() {
+		
+		if(singletone ==1) {
+			return kml;
+		}
+		
+		return new kmlmaker();
+		
+	}
 	
 }

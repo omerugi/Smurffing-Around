@@ -1,5 +1,9 @@
 package elements;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import dataStructure.edge_data;
 import utils.*;
 
@@ -8,16 +12,28 @@ public class Fruit {
 	edge_data fruitEdge; //where the fruit at 
 	double 		value; 
 	double 		type; 
-	Point3D 	Location; 
+	Point3D 	location;
+	String 		StartTime;
+	double 		id;
+	static int style_init =0;
 	
+
 	public Fruit() {}
-	  
-	  public Fruit(double type, double v, Point3D p, edge_data e) {
+
+	public Fruit(double type, double v, Point3D p, edge_data e) {
 		this.type = type;
-	    this.value = v;
-	    this.Location = new Point3D(p);
-	    this.fruitEdge = e;
-	  }
+		this.value = v;
+		this.location = new Point3D(p);
+		this.fruitEdge = e;
+		id = (p.x() +p.y())*type;
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
+		this.StartTime = now.toString(); 
+	}
+
+	public double getID() {
+		return this.id;
+	}
 
 	public edge_data getFruitEdge() {
 		return fruitEdge;
@@ -32,64 +48,67 @@ public class Fruit {
 	}
 
 	public Point3D getLocation() {
-		return Location;
+		return location;
 	}	   
-	  
+
 	public void setValue(double v) {
 		this.value=v;
 	}
-//	  public Fruit(String JsonFruit) {
-//		    this._value = v;
-//		    this._pos = new Point3D(p);
-//		    this._edge = e;
-//		  }
-//	  
-//	  public int getType() {
-//	    int ans = 0;
-//	    ans = this._edge.getDest() - this._edge.getSrc();
-//	    return ans;
-//	  }
-//	  
-//	  public Point3D getLocation() {
-//	    return new Point3D(this._pos);
-//	  }
-//	  
-//	  public String toJSON1() {
-//	    String ans = "{\"Fruit\":{\"value\":10,\"type\":1,\"pos\":\"35.187615443099276,32.103800431932775,0.0\"}}";
-//	    return ans;
-//	  }
-//	  
-//	  public String toString() {
-//	    return toJSON();
-//	  }
-//	  
-//	  public String toJSON() {
-//	    int d = 1;
-//	    if (this._edge.getSrc() > this._edge.getDest())
-//	      d = -1; 
-//	    String ans = "{\"Fruit\":{\"value\":" + 
-//	      this._value + "," + 
-//	      "\"type\":" + d + "," + 
-//	      "\"pos\":\"" + this._pos.toString() + "\"" + 
-//	      "}" + 
-//	      "}";
-//	    return ans;
-//	  }
-//	  
-//	  public double getValue() {
-//	    return this._value;
-//	  }
-//	  
-//	  public double grap(robot r, double dist) {
-//	    double ans = 0.0D;
-//	    if (this._edge != null && r != null) {
-//	      int d = r.getNextNode();
-//	      if (this._edge.getDest() == d) {
-//	        Point3D rp = r.getLocation();
-//	        if (dist > rp.distance2D(this._pos))
-//	          ans = this._value; 
-//	      } 
-//	    } 
-//	    return ans;
-//	  }
+
+	public String getStartTime() {
+		return this.StartTime;
+	}
+	
+	public static String init_Kml() {
+		
+		if(style_init >0) { return "";}
+		style_init++;
+		String temp = " <Style id=\"banana\">\r\n" + 
+				"      <IconStyle>\r\n" + 
+				"        <Icon>\r\n" + 
+				"          <href>https://img.icons8.com/plasticine/100/000000/banana.png</href>\r\n" + 
+				"        </Icon>\r\n" + 
+				"      </IconStyle>\r\n" + 
+				"    </Style>"+
+				" <Style id=\"apple\">\r\n" + 
+				"      <IconStyle>\r\n" + 
+				"        <Icon>\r\n" + 
+				"          <href>https://img.icons8.com/doodle/96/000000/apple.png</href>\r\n" + 
+				"        </Icon>\r\n" + 
+				"      </IconStyle>\r\n" + 
+				"    </Style>"
+				;
+		
+		return temp;
+	}
+	
+	public String to_kml() {
+		
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
+		
+		String fruit;
+		String name;
+		if(type == -1) {
+			fruit = "#banana";
+			name = "banan";
+		}else {
+			fruit = "#apple";
+			name = "apple";
+		}
+		
+		String temp = "<Placemark>\r\n" + 
+				"		<name>"+name+"</name>\r\n" + 
+				"		<description> value of fruit: "+this.value+"</description>\r\n" + 
+				"		<Point>\r\n" + 
+				"			<coordinates>"+ this.location.x()+","+this.location.y()+","+"0"+"</coordinates>\r\n" + 
+				"		</Point>\r\n" +
+				"		<TimeSpan>\r\n" + 
+				"    <begin>"+StartTime+"</begin>\r\n" + 
+				"	 <end>"+ now.toString()+"</end>"+
+				"  		</TimeSpan>\r\n	"+
+				"<styleUrl>"+fruit+"</styleUrl>"+
+				"	</Placemark>\n";
+		return temp;
+	}
 }

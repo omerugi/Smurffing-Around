@@ -130,4 +130,13 @@ public class Edge implements edge_data, Serializable{
 		}
 		return false;
 	}
+	
+	public String cord_kml() {
+		
+		String temp = ""+
+		this.src.getLocation().x()+","+this.src.getLocation().y()+",0"+" "+
+		this.dest.getLocation().x()+","+this.dest.getLocation().y()+",0"+" ";
+		return temp;
+	}
+	
 }

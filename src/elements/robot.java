@@ -1,9 +1,15 @@
 package elements;
 
 
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import com.sun.glass.ui.Robot;
 
 import Server.fruits;
 import dataStructure.MinHeap;
@@ -22,8 +28,14 @@ public class robot {
 	MinHeap robot_Heap;		//will contain a list of the shortest paths from the robot to a fruit.
 	double path_len;		//the length of the path to the fruit. 
 	Fruit fruit;			//the fruit the robot goes to.
+	StringBuffer robotBuffer;
+	int folder=0;
+	private static int style_init =0;
+	
 	//defult constructor. 
-	public robot(){}
+	public robot(){
+		robotBuffer= new StringBuffer(); 
+	}
 
 	public robot(int id, Point3D location, double speed, int src, int dest) {
 		this.id = id;
@@ -33,10 +45,13 @@ public class robot {
 		this.dest = dest;
 		path = new LinkedList<Edge>();
 		robot_Heap = new MinHeap();
+		robotBuffer= new StringBuffer(); 
+
 	}
 	
 	public robot(int id){
 		this.id = id;
+		robotBuffer= new StringBuffer(); 
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,6 +187,61 @@ public class robot {
 	
 	public void setFruit(Fruit fruit) {
 		this.fruit = fruit;
+	}	
+	
+	static public String init_Kml() {
+		
+		if(style_init >0) { return "";}
+		style_init++;
+		String temp = " <Style id=\"robot_icon\">\r\n" + 
+				"      <IconStyle>\r\n" + 
+				"        <Icon>\r\n" + 
+				"          <href>https://img.icons8.com/color/128/000000/transformer.png</href>\r\n" + 
+				"        </Icon>\r\n" + 
+				"      </IconStyle>\r\n" + 
+				"    </Style>";
+		
+		return temp;
+	}
+	
+	public void add_start() {
+		
+		String temp = "<Folder>\r\n" + 
+				"      <name>robot"+this.id+" folder</name>\r\n" + 
+				"      <open>1</open>\r\n" + 
+				"      <Style>\r\n" + 
+				"        <ListStyle>\r\n" + 
+				"          <listItemType>"+"robot-"+this.id+" path"+"</listItemType>\r\n" + 
+				"        </ListStyle>\r\n" + 
+				"      </Style>/n";
+		this.robotBuffer.append(temp);
+		
 	}
 
+	public void add_kml_loc() {
+		if(folder == 0) {add_start();folder++;}
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
+				
+		String temp  = "      "
+				+ "	   <Placemark>\r\n" + 
+				"        <TimeStamp>\r\n" + 
+				"          <when>"+now+"</when>\r\n" + 
+				"        </TimeStamp>\r\n" + 
+				"        <styleUrl>#robot_icon</styleUrl>\r\n" + 
+				"        <Point>\r\n" + 
+				"			<coordinates>"+ this.location.x()+","+this.location.y()+","+"0"+"</coordinates>\r\n" + 
+				"        </Point>\r\n" + 
+				"      </Placemark>\n";
+		this.robotBuffer.append(temp);
+	}
+	
+	public String stringTokml() {
+		this.robotBuffer.append("</Folder>\r\n");
+	    
+		return robotBuffer.toString();
+	}
+	
+	
+	
 }

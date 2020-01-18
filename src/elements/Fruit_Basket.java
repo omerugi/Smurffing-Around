@@ -19,9 +19,10 @@ import utils.Point3D;
 public class Fruit_Basket {
 
 	ArrayList <Fruit> fruits = new ArrayList<Fruit>();; 
-
-	public Fruit_Basket () {}
-	
+	StringBuffer fruitBuffer = new StringBuffer();
+	public Fruit_Basket () {
+		start_kml();
+	}
 	public Fruit_Basket (game_service game, DGraph gg) {
 		
 		List<String> Fruit = game.getFruits();
@@ -43,6 +44,27 @@ public class Fruit_Basket {
 			} catch (JSONException e) {e.printStackTrace();}
 			
 		}	
+		start_kml();
+	}
+	
+	private void start_kml() {
+		
+		fruitBuffer.append(Fruit.init_Kml());
+		String temp = "<Folder>\r\n" + 
+				"      <name>fruits</name>";
+		fruitBuffer.append(temp);
+	}
+	
+	public String end_kml() {
+		
+		for (int i = 0; i < fruits.size(); i++) {
+			fruitBuffer.append(fruits.get(i).to_kml());
+		}
+		
+		String temp = "</Folder>\r\n";
+		fruitBuffer.append(temp);
+		
+		return fruitBuffer.toString();
 		
 	}
 	
@@ -53,41 +75,37 @@ public class Fruit_Basket {
 			
 		for (int i = 0; i  < temp_fruits.size(); i++) {
 			
-			if(!contains(temp_fruits.get(i).Location, temp_fruits.get(i).getType(), temp_fruits.get(i).getValue())) {
+			if(!contains(temp_fruits.get(i).getLocation(), temp_fruits.get(i).getType(), temp_fruits.get(i).getValue())) {
 				this.fruits.add(temp_fruits.get(i));
 			}
 		}
 		
-		if(this.fruits.size() != temp_fruits.size()) {
-			RemoveUnusedFruits(temp_fruits); 
-		}	
+		boolean flag = false;
+		for (int i = 0; i  < fruits.size(); i++) {
+		
+			for (int j =0; j < temp_fruits.size() ; j++) {
+				
+				if(fruits.get(i).getID() == temp_fruits.get(j).getID()) {
+					flag = true; j = temp_fruits.size();
+				}
+			}
+			
+			if(!flag) {
+				fruitBuffer.append(fruits.get(i).to_kml());
+				fruits.remove(i);
+			}
+			flag = false;
+		}
+		
 	}
 
-	private void RemoveUnusedFruits(ArrayList<Fruit> temp_fruits) {
-		
-		for (int i = 0; i < temp_fruits.size(); i++) {
-			int [] check= contains2(temp_fruits.get(i).Location, temp_fruits.get(i).type ,temp_fruits.get(i).value); 
-			if(check [0] == 0) { // fruit need to be deleted;
-				this.fruits.remove(check[1]);
-			}
-		}
-	}
-	
-	private int [] contains2(Point3D fruit_pos, double type, double value ) {
-		int [] re = new int [2];
-		for (int i = 0; i < this.fruits.size(); i++) {
-			if(!(fruits.get(i).Location==fruit_pos && fruits.get(i).type==type && fruits.get(i).value==value)) {re[0]=0; re[1]=i;}
-		}
-		re [0]= 1;		re [1]=-1;		return  re;
-	}
-	
-	
-	
-	
 	
 	private boolean contains(Point3D fruit_pos, double type, double value ) {
 		for (int i = 0; i < this.fruits.size(); i++) {
-			if(fruits.get(i).Location==fruit_pos && fruits.get(i).type==type && fruits.get(i).value==value) {return true;}
+			if(fruits.get(i).getLocation().x()==fruit_pos.x() 
+					&& fruits.get(i).getLocation().y() ==fruit_pos.y()  
+					&& fruits.get(i).type==type && fruits.get(i).value==value) 
+			{return true;}
 		}
 		return false;
 	}

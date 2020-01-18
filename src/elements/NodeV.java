@@ -121,5 +121,18 @@ public class NodeV implements node_data, Serializable {
 	public static void reset_count() {
 		id = 0;
 	}
-
+	
+	public String to_kml() {
+		
+		String temp = " <Placemark>\r\n" + 
+				"		<name>Vertex:" +this.getKey() +"</name>\r\n" +  
+				"		<description> Graph's vertex	</description>\n"+			
+				"		<Point>\r\n" +  
+				"			<coordinates>"+this.getLocation().x() +","+this.getLocation().y()+",1</coordinates>\r\n" + 
+				"		</Point>\r\n" + 
+				"	</Placemark>\n";
+		
+		return temp;
+	}
+	
 }

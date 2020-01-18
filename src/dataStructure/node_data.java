@@ -56,5 +56,10 @@ public interface node_data {
 	 * practice for marking by algorithms.
 	 * @param t - the new value of the tag
 	 */
+	
 	public void setTag(int t);
+	
+	
+	public String to_kml();
+	
 }

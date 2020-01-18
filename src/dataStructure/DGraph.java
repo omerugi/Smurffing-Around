@@ -35,60 +35,60 @@ import utils.Point3D;
  */
 
 public class DGraph extends Observable  implements graph, Serializable {
-	
+
 
 	////////////////////////////////////////////
 	//////////////    fields     ///////////////
 	////////////////////////////////////////////
-	
+
 	private static final long serialVersionUID = 4L;
-	
+
 	// contains all the vertexes by ID and weight.
 	HashMap<Integer,node_data> vertex = new HashMap<Integer, node_data>();;
-	
+
 	// contains all the edges by ID(src ver) and edge_data. 
 	HashMap<Integer, HashMap<Integer, edge_data>> edges = new HashMap<Integer, HashMap<Integer, edge_data>>();
 	int mc =0;
-	
+
 	/////////////////////////////////////////////////////////////////
 	///////////////////     Constructor     /////////////////////////
 	/////////////////////////////////////////////////////////////////
-	
+
 	public DGraph() {}
-	
+
 	public DGraph(String file_name)
-	  {
-	    try {
-	     NodeV.reset_count();
-	      Scanner scanner = new Scanner(new File(file_name));
-	      String jsonString = scanner.useDelimiter("\\A").next();
-	      scanner.close();
+	{
+		try {
+			NodeV.reset_count();
+			Scanner scanner = new Scanner(new File(file_name));
+			String jsonString = scanner.useDelimiter("\\A").next();
+			scanner.close();
 
-	      JSONObject graph = new JSONObject(jsonString);
-	      JSONArray nodes = graph.getJSONArray("Nodes");
-	      JSONArray edges = graph.getJSONArray("Edges");
-	      for (int i = 0; i < nodes.length(); i++)
-	      {
-	        int id = nodes.getJSONObject(i).getInt("id");
-	        String pos = nodes.getJSONObject(i).getString("pos");
-	        Point3D p = new Point3D(pos);
-	        addNode(new NodeV(p,id));
-	      }
+			JSONObject graph = new JSONObject(jsonString);
+			JSONArray nodes = graph.getJSONArray("Nodes");
+			JSONArray edges = graph.getJSONArray("Edges");
+			for (int i = 0; i < nodes.length(); i++)
+			{
+				int id = nodes.getJSONObject(i).getInt("id");
+				String pos = nodes.getJSONObject(i).getString("pos");
+				Point3D p = new Point3D(pos);
+				addNode(new NodeV(p,id));
+			}
 
-	      for (int i = 0; i < edges.length(); i++)
-	      {
-	        int s = edges.getJSONObject(i).getInt("src");
-	        int d = edges.getJSONObject(i).getInt("dest");
-	        double w = edges.getJSONObject(i).getDouble("w");
-	        connect(s, d, w);
-	      }
-	    }
-	    catch (Exception e) {
-	      e.printStackTrace();
-	    }
-	  }
-	
-	
+			for (int i = 0; i < edges.length(); i++)
+			{
+				int s = edges.getJSONObject(i).getInt("src");
+				int d = edges.getJSONObject(i).getInt("dest");
+				double w = edges.getJSONObject(i).getDouble("w");
+				connect(s, d, w);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
 
 	///////////////////////////////////////////////////////////////////////////
 	////////////////////////////       methods        /////////////////////////
@@ -96,37 +96,37 @@ public class DGraph extends Observable  implements graph, Serializable {
 
 
 	public void init(String jsonSTR)
-	  {
-	    try {
-	      NodeV.reset_count();;
+	{
+		try {
+			NodeV.reset_count();;
 
-	      //this.e_count = 0;
-	      JSONObject graph = new JSONObject(jsonSTR);
-	      JSONArray nodes = graph.getJSONArray("Nodes");
-	      JSONArray edges = graph.getJSONArray("Edges");
-	      for (int i = 0; i < nodes.length(); i++)
-	      {
-	        int id = nodes.getJSONObject(i).getInt("id");
-	        String pos = nodes.getJSONObject(i).getString("pos");
-	        Point3D p = new Point3D(pos);
-	        addNode(new NodeV(p,id));
-	      }
+			//this.e_count = 0;
+			JSONObject graph = new JSONObject(jsonSTR);
+			JSONArray nodes = graph.getJSONArray("Nodes");
+			JSONArray edges = graph.getJSONArray("Edges");
+			for (int i = 0; i < nodes.length(); i++)
+			{
+				int id = nodes.getJSONObject(i).getInt("id");
+				String pos = nodes.getJSONObject(i).getString("pos");
+				Point3D p = new Point3D(pos);
+				addNode(new NodeV(p,id));
+			}
 
-	      for (int i = 0; i < edges.length(); i++)
-	      {
-	        int s = edges.getJSONObject(i).getInt("src");
-	        int d = edges.getJSONObject(i).getInt("dest");
-	        double w = edges.getJSONObject(i).getDouble("w");
-	        connect(s, d, w);
-	      }
-	    }
-	    catch (Exception e) {
-	      e.printStackTrace();
-	    }
-	  }
-	
-	
-	
+			for (int i = 0; i < edges.length(); i++)
+			{
+				int s = edges.getJSONObject(i).getInt("src");
+				int d = edges.getJSONObject(i).getInt("dest");
+				double w = edges.getJSONObject(i).getDouble("w");
+				connect(s, d, w);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
 	/**
 	 * returns the node obj for given id key; 
 	 */
@@ -238,7 +238,7 @@ public class DGraph extends Observable  implements graph, Serializable {
 		vertex.remove(key);
 		setChanged();
 		notifyObservers();
-		
+
 		return removed;
 
 	}
@@ -274,7 +274,7 @@ public class DGraph extends Observable  implements graph, Serializable {
 			edges.get(src).remove(dest);
 			setChanged();
 			notifyObservers();
-			
+
 			return temp; 
 		}
 		return null;
@@ -291,21 +291,21 @@ public class DGraph extends Observable  implements graph, Serializable {
 	 */
 	@Override
 	public int edgeSize() {
-		
+
 		int sum =0;
-		
+
 		Set mapSet = vertex.keySet();
 		Iterator hit = mapSet.iterator();
-		
+
 		while (hit.hasNext()) {
-			
+
 			Collection<edge_data> e = getE((int)hit.next());
 			if(e== null) continue;
 			sum+=e.size();
 		}
-		
+
 		return sum;
-		
+
 	}
 
 	/**
@@ -316,26 +316,78 @@ public class DGraph extends Observable  implements graph, Serializable {
 		return mc;
 	}
 
-	
+
 	public void EdgeInitTag() {
 		Set setMapKey = vertex.keySet();
 		Iterator hit = setMapKey.iterator();
 		while(hit.hasNext()) {
-			
+
 			int a = (int) hit.next();
-			
+
 			Collection<edge_data> e = this.getE(a);
 			Iterator hit2 = e.iterator();
-			
+
 			while (hit2.hasNext()) {
-				
+
 				edge_data ee = (edge_data) hit2.next();
 				ee.setTag(-1);
-				
+
 			}
-			
+
 		}
-		
+
 	}
+
+	public String to_kml() {
+
+		Iterator hit = getV().iterator();
+		StringBuffer edges_kml = new StringBuffer();
+		edges_kml.append(add_headline_edges());
+
+		StringBuffer graph_kml = new StringBuffer();
+		graph_kml.append("<Folder>\r\n+"
+				+ "      <name>Graph</name>");
+		
+		while(hit.hasNext()) {
+			node_data v = (node_data) hit.next();
+			int i=0;
+
+			graph_kml.append(v.to_kml());
+
+			Collection<edge_data>edges = getE(v.getKey());
+			if(edges == null) {continue;}
+			//go over the edges that come out of the specific vertex\\ 
+			Iterator hit2 = edges.iterator();
+
+			while(hit2.hasNext()) {
+
+				edge_data dest = (edge_data) hit2.next();
+				edges_kml.append(dest.cord_kml());
+			}
+
+		}
+
+		graph_kml.append(edges_kml.toString());
+		graph_kml.append("</coordinates>\r\n" + 
+				"		</LineString>\r\n" + 
+				"	</Placemark>"+
+				"</Folder>\r\n");
+		
+
+		return graph_kml.toString();
+	}
+
+	private String add_headline_edges() {
+
+		String temp = "<Placemark>\r\n" + 
+				"		<name>Graph</name>\r\n" + 
+				"		<styleUrl>#m_ylw-pushpin</styleUrl>\r\n" + 
+				"		<LineString>\r\n" + 
+				"			<tessellate>1</tessellate>\r\n" + 
+				"			<coordinates>\n";
+		return temp;
+
+	}
+
 
 }

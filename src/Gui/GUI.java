@@ -107,7 +107,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		this.setSize(defultx,defulty);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		ImageIcon ImageIcon5 = new ImageIcon("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\GameIcon.jpg");
+		ImageIcon ImageIcon5 = new ImageIcon("data\\GameIcon.jpg");
 		Image GameIcon  =	ImageIcon5.getImage();
 		this.setIconImage(GameIcon);
 
@@ -160,6 +160,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void paint(Graphics g)
 	{	
+		
 		//call paint func\\
 		if(buff == null || g2 == null || (this.WIDTH != defultx || this.HEIGHT != defulty )) {
 			
@@ -171,7 +172,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 			ImageIcon img = new ImageIcon("data\\background.jpg");
 			background = new JLabel("", img ,JLabel.CENTER);
 			background.setBounds(0,0, defultx-17, defulty-40);
-		
 			
 			add(background);
 			
@@ -182,30 +182,20 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 			g2 = buff.createGraphics();
 			super.paint(g2);
 			paintgraph(g2);
-
 		}
 
 		Graphics g2_comp = (Graphics2D)g;
 		g2_comp.drawImage(buff,0,0,null);
-		
-		
-		
-		
-//		ImageIcon snoop = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\snoop2.gif");
-//		Image  snoop1  = snoop.getImage();
-//		g2_comp.drawImage(snoop1, 350 ,100,1200,1000, this);
-//		
+			
 		paintsmurfs(g2_comp);
 	
 		paintrobotsAuto(g2_comp);
-		
 		
 		if(game.timeToEnd()/100<1) {	
 			ImageIcon GameOver = new ImageIcon("GameOver.png");
 			Image  GameOver1  = GameOver.getImage();
 			g.drawImage(GameOver1, 0, 0,defultx-17, defulty-40, this);
 		}
-
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////EndPaint//////////////////////////////////////////////////////////////
@@ -370,6 +360,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 			
 			g4.setFont(g4.getFont().deriveFont(f));
 			g.drawString(""+v.getKey(),xv-9,yv+3);
+			
+			ImageIcon Score = new ImageIcon("data\\Score.png");
+			Image  Score1  = Score.getImage();
+			g.drawImage(Score1, 60, 60,300,300, this);
+			
 		
 		}
 
@@ -377,11 +372,10 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 	///////////////////////////////////////////////////Paint Graph End////////////////////////////////////////////////////////
 
-
 	///////////////////////////////////////////////////Paint smurfs///////////////////////////////////////////////////////////
 	private void paintsmurfs(Graphics g) {
 		List<String> Fruit = game.getFruits();
-
+		
 		for (int j = 0; j < Fruit.size(); j++) {
 
 			try {
@@ -396,10 +390,10 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 				double x = Double.parseDouble(st1.nextToken());
 				double y = Double.parseDouble(st1.nextToken());
-
-				ImageIcon DardasAba = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\Dardasaba.png");
+				
+				ImageIcon DardasAba = new ImageIcon("data\\Dardasaba.png");
 				Image  DardasAba1  = DardasAba.getImage();
-				ImageIcon Dardasit = new ImageIcon("C:\\Users\\dorge\\eclipse-workspace\\OOP-Ex3\\Dardasit.png"); 
+				ImageIcon Dardasit = new ImageIcon("data\\Dardasit.png"); 
 				Image  Dardasit1   =	Dardasit.getImage();
 
 				if(type == -1) {
@@ -408,86 +402,48 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 				else {
 					g.drawImage(Dardasit1, reallocX(x)-30, reallocY(y)-30,50,50, this);
 				}
-
-
 			} catch (JSONException e) {e.printStackTrace();}
-
-
 		}
-
 	}
-
 	///////////////////////////////////////////////////Paint smurfs End//////////////////////////////////////////////////////
 	private void paintrobotsAuto(Graphics g) {
 		List<String> ArnoldSchwarzenegge = game.getRobots();
+		int _score =0;
 		for (int j = 0; j < ArnoldSchwarzenegge.size(); j++) {
-
+			
 			try {
-
 				JSONObject obj = new JSONObject(ArnoldSchwarzenegge.get(j));
 				JSONObject ff = obj.getJSONObject("Robot");
 
 				String pos = ff.getString("pos");
 				int rid = ff.getInt("id");
+				int score = ff.getInt("value");
+				_score += score;
 				StringTokenizer st1 = new StringTokenizer(pos, ","); 
-
+				
 				double x = Double.parseDouble(st1.nextToken());
 				double y = Double.parseDouble(st1.nextToken());
 
-				ImageIcon Gargamel = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\Gargamel.png");
+				ImageIcon Gargamel = new ImageIcon("data\\Gargamel.png");
 				Image  Gargamel1  = Gargamel.getImage();
 				g.drawImage(Gargamel1, reallocX(x)-30, reallocY(y)-30,80,80, this);
 				g.setColor(Color.RED);
 				g.drawString(""+rid, reallocX(x)-20, reallocY(y)-20);
 			} catch (JSONException e) {e.printStackTrace();}
-
-
-
-
 		}
-
-	}
-	private void paintrobotsMenual(Graphics g2_comp) {
-
-
-		List<String> ArnoldSchwarzenegge = game.getRobots();
-		robotsDialog = new int [ArnoldSchwarzenegge.size()][4];
-		for (int j = 0; j < ArnoldSchwarzenegge.size(); j++) {
-
-			try {
-
-				JSONObject obj = new JSONObject(ArnoldSchwarzenegge.get(j));
-				JSONObject ff = obj.getJSONObject("Robot");
-				int rid = ff.getInt("id");
-				int src = ff.getInt("src");
-				int dest = ff.getInt("dest");
-				String pos = ff.getString("pos");
-
-				System.out.println(dest);
-
-				StringTokenizer st1 = new StringTokenizer(pos, ","); 
-
-				double x = Double.parseDouble(st1.nextToken());
-				double y = Double.parseDouble(st1.nextToken());
-
-
-				ImageIcon Gargamel = new ImageIcon("C:\\\\Users\\\\dorge\\\\eclipse-workspace\\\\OOP-Ex3\\\\Gargamel.png");
-				Image  Gargamel1  = Gargamel.getImage();
-				g2_comp.drawImage(Gargamel1, reallocX(x)-25, reallocY(y)-32,80,80, this);
-				robotsDialog[j][0] = rid; 
-				robotsDialog[j][1] = dest; 
-				robotsDialog[j][2] = reallocX(x); 
-				robotsDialog[j][3] = reallocY(y); 
-
-				System.out.println("gargamel:"+reallocX(x) + " "+ reallocY(y));
-			} catch (JSONException e) {e.printStackTrace();}
-
-
-		}
+		Graphics2D g4 = (Graphics2D) g;
+		
+		g4.setColor(Color.BLACK);
+		float f=50.0f; // font size.
+		g4.setFont(g4.getFont().deriveFont(f));
+		g4.drawString("Score:", 133, 245);
+		g4.setColor(Color.RED);
+		float f1=50.0f; // font size.
+		g4.setFont(g4.getFont().deriveFont(f1));
+		g4.drawString(""+_score, 156, 300);
 
 
 	}
-
 }
 
 

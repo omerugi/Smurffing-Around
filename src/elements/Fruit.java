@@ -66,14 +66,14 @@ public class Fruit {
 		String temp = " <Style id=\"banana\">\r\n" + 
 				"      <IconStyle>\r\n" + 
 				"        <Icon>\r\n" + 
-				"          <href>https://img.icons8.com/plasticine/100/000000/banana.png</href>\r\n" + 
+				"          <href>https://img.icons8.com/plasticine/456/000000/banana.png</href>\r\n" + 
 				"        </Icon>\r\n" + 
 				"      </IconStyle>\r\n" + 
 				"    </Style>"+
 				" <Style id=\"apple\">\r\n" + 
 				"      <IconStyle>\r\n" + 
 				"        <Icon>\r\n" + 
-				"          <href>https://img.icons8.com/doodle/96/000000/apple.png</href>\r\n" + 
+				"          <href>https://img.icons8.com/doodle/456/000000/apple.png</href>\r\n" + 
 				"        </Icon>\r\n" + 
 				"      </IconStyle>\r\n" + 
 				"    </Style>"
@@ -91,7 +91,7 @@ public class Fruit {
 		String name;
 		if(type == -1) {
 			fruit = "#banana";
-			name = "banan";
+			name = "banana";
 		}else {
 			fruit = "#apple";
 			name = "apple";

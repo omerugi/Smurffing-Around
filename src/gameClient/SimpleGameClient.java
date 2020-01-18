@@ -46,32 +46,36 @@ import utils.kmlmaker;
  */
 public class SimpleGameClient extends Observable implements Runnable {
 
-	static Fruit_Basket fruits;
-	static ArrayList<robot> robots_list;
-	static HashMap<Integer, Queue<Edge>> robot_final_dest1 = new HashMap<Integer, Queue<Edge>>();
-	static HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
-	static ArrayList<Double> final_dest_len = new ArrayList<Double>();
-	static boolean flag = true;
-	static kmlmaker kml;
+	 Fruit_Basket fruits;
+	 ArrayList<robot> robots_list;
+	 HashMap<Integer, Queue<Edge>> robot_final_dest1 = new HashMap<Integer, Queue<Edge>>();
+	 HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
+	 ArrayList<Double> final_dest_len = new ArrayList<Double>();
+	 boolean flag = true;
+	 kmlmaker kml;
 	
-	public static void test1() {
+	public  void test1() {
 
 
 		//////////////////////Variables hold the game setting////////////////////////// 
 		JFrame frame = null; int Level_chooser = 0; int GameType_chooser = 0;
-
+		boolean flag = true;
+		
+		while (flag) {
 		/////////////////////Choose Game Type : Auto or Manual////////////////////////
 		Object[] possibilities1 = {"Automatic" , "Menual"};
 		String s1 =  (String)JOptionPane.showInputDialog(frame,"Play automatic or Menual","Auto or Menual", JOptionPane.PLAIN_MESSAGE,null ,possibilities1,  "");
 		if(s1 == "Automatic") {GameType_chooser  = 0 ; }
 		if(s1 == "Menual")    {GameType_chooser  = 1 ; }
-
+		
 		///////////////////////////////Choose level//////////////////////////////////
 		Object[] possibilities2 = {"0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
 		String s2 = (String)JOptionPane.showInputDialog(frame,"pick game","Choose Game Level:", JOptionPane.PLAIN_MESSAGE,null ,possibilities2,  "");
-		Level_chooser =Integer.parseInt(s2);	
-
-
+		try {
+		Level_chooser =Integer.parseInt(s2);
+		flag = false;
+		}catch (Exception e) {};
+		}
 		game_service game = Game_Server.getServer(Level_chooser); //peek the level from server. 
 
 		String graph_string = game.getGraph();					 //Getting the level map(graph). 
@@ -93,7 +97,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 
 		////Open a manual Game/////
 		if(GameType_chooser == 1) {
-			//	playMenual(dgraph,game); 
+			playMenual(dgraph,game); 
 			//game is running...
 		}
 
@@ -117,7 +121,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 		kml.add_kml(fruits.end_kml());
 		
 		Object[] possibilities21 = {"YES" , "NO"};
-		String s4 =  (String)JOptionPane.showInputDialog(frame,"Save","Continue without saving", JOptionPane.PLAIN_MESSAGE,null ,possibilities21,  "");
+		String s4 =  (String)JOptionPane.showInputDialog(frame,"would you like to save?","Save Panel", JOptionPane.PLAIN_MESSAGE,null ,possibilities21,  "");
 		if(s4 == "YES")   {
 			FileDialog chooser = new FileDialog(frame, "Use a .kml extension", FileDialog.SAVE);
 			chooser.setVisible(true);
@@ -127,7 +131,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 		System.out.println("Game Over: "+results);
 	}
 
-	static private void initRobots(game_service game, DGraph gg) {
+	 private void initRobots(game_service game, DGraph gg) {
 
 		String graph_string = game.getGraph();
 		String info = game.toString();
@@ -164,9 +168,6 @@ public class SimpleGameClient extends Observable implements Runnable {
 
 	}
 
-
-
-
 	
 	/**
 	 * Main Method of the automatic game:
@@ -175,7 +176,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 	 * @param dgraph -the game graph.
 	 * @param game 	 -game server.
 	 */
-	private static void PlayAuto(DGraph dgraph, game_service game) {
+	private  void PlayAuto(DGraph dgraph, game_service game) {
 
 		//Open the Game window display (GUI)
 		GUI gui = new GUI(dgraph,game,0);
@@ -199,13 +200,13 @@ public class SimpleGameClient extends Observable implements Runnable {
 
 	}
 
-	static long update_time =System.currentTimeMillis();
+	 long update_time =System.currentTimeMillis();
 	/**
 	 * in charge of setting all the information of the robots in the game. 
 	 * @param game
 	 * @param gg
 	 */
-	static private void updateRobots(game_service game, DGraph gg) {
+	 private void updateRobots(game_service game, DGraph gg) {
 
 		List<String> log = game.move();		 // getting the game log information. 
 
@@ -273,8 +274,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 		}
 	}
 
-
-	static private void new_moveRobots(game_service game, DGraph gg) {
+	 private void new_moveRobots(game_service game, DGraph gg) {
 
 		List<String> log = game.move();
 
@@ -360,7 +360,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 	}
 
 
-	private static void playMenual(DGraph dgraph, game_service game) {
+	private  void playMenual(DGraph dgraph, game_service game) {
 		GUI gui = new GUI(dgraph,game,1);
 		gui.setVisible(true);
 		game.startGame();
@@ -373,10 +373,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 
 	}
 
-
-
-
-	static private void moveRobotsM(game_service game, DGraph gg) {
+	 private void moveRobotsM(game_service game, DGraph gg) {
 
 		List<String> log = game.move();
 		Frame frame = null; 
@@ -384,6 +381,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 		if(log!=null) {
 
 			updateRobots(game,gg);
+			fruits.update(game, gg);
 
 			for(int i=0;i<log.size();i++) {
 				if(!robot_final_dest1.containsKey(i)) {
@@ -403,7 +401,7 @@ public class SimpleGameClient extends Observable implements Runnable {
 								d_choosen =Integer.parseInt(temp1);	
 								if(gg.getNode(d_choosen)!=null) {flag=false; continue;}
 							}	System.out.println("dest Not Valid");
-						}catch (Exception e) {}		
+						}catch (Exception e) {System.out.println("MSMS");}		
 					}flag=true;
 
 					List<node_data> temp = Graph_Algo.shortestPath(robots_list.get(i).getSrc(), d_choosen, gg);
@@ -442,8 +440,6 @@ public class SimpleGameClient extends Observable implements Runnable {
 		test1();
 
 	}
-
-
 
 
 }

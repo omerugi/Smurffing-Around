@@ -112,5 +112,4 @@ This class is a singleton class that will manage and build a KML file given to i
 
 ******how to use -> Wiki
 
-example :
 

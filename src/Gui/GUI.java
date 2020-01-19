@@ -70,7 +70,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	// contains all the edges by ID(src ver) and edge_data. 
 	public Collection<edge_data> edges;
 	private graph graph;
-	Graph_Algo G = new Graph_Algo();
 	private game_service game;
 
 
@@ -83,7 +82,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		initGUI();
 		this.vertex	= dg.getV();
 		this.graph = dg;
-		G.init(this.graph);
 		((Observable) graph).addObserver(this);
 	}
 
@@ -93,7 +91,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		this.game = game; 
 		this.vertex	= dg.getV();
 		this.graph = dg;
-		G.init(this.graph);
 		((Observable) graph).addObserver(this);
 	}
 

@@ -13,14 +13,14 @@ import utils.*;
  */
 public class Fruit {
 
-	edge_data fruitEdge; //where the fruit at 
+	edge_data 	fruitEdge; 		//where the fruit at 
 	double 		value; 			//value of the fruit
 	double 		type; 			//fruit type (-1/1)
 	Point3D 	location;		//fruit 3D coordinates
 	String 		StartTime;		//time stamp of the fruit creations.
 	double 		id;				//fruit id (fruit id is the sum of the multiplication of 
 								//the x*y*type (x,y 3D coordinates of the fruit). 
-	static int style_init =0;	//
+	static int style_init =0;	//will indicates if the 'style' section already written to the KML
 	
 /**
  * Default Constructor; 
@@ -126,6 +126,8 @@ public class Fruit {
 		
 		String fruit;
 		String name;
+		
+		// pick what type of style & the name to use banana/ apple
 		if(type == -1) {
 			fruit = "#banana";
 			name = "banana";
@@ -134,6 +136,7 @@ public class Fruit {
 			name = "apple";
 		}
 		
+		// create the KML output
 		String temp = "<Placemark>\r\n" + 
 				"		<name>"+name+"</name>\r\n" + 
 				"		<description> value of fruit: "+this.value+"</description>\r\n" + 

@@ -53,8 +53,12 @@ public class DGraph extends Observable  implements graph, Serializable {
 	/////////////////////////////////////////////////////////////////
 	///////////////////     Constructor     /////////////////////////
 	/////////////////////////////////////////////////////////////////
-	//Default Constructor. 
+
+	/**
+	 * Default Constructor. 
+	 */
 	public DGraph() {}
+
 	/**
 	 * initialized graph using a txt string.  
 	 * @param file_name - txt file holds graph.
@@ -97,10 +101,10 @@ public class DGraph extends Observable  implements graph, Serializable {
 	////////////////////////////       methods        /////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-/**
- * sub method for initialized graph from Json String 
- * @param jsonSTR 
- */
+	/**
+	 * sub method for initialized graph from Json String 
+	 * @param jsonSTR 
+	 */
 	public void init(String jsonSTR)
 	{
 		try {
@@ -323,31 +327,11 @@ public class DGraph extends Observable  implements graph, Serializable {
 	}
 
 
-	public void EdgeInitTag() {
-		Set setMapKey = vertex.keySet();
-		Iterator hit = setMapKey.iterator();
-		while(hit.hasNext()) {
-
-			int a = (int) hit.next();
-
-			Collection<edge_data> e = this.getE(a);
-			Iterator hit2 = e.iterator();
-
-			while (hit2.hasNext()) {
-
-				edge_data ee = (edge_data) hit2.next();
-				ee.setTag(-1);
-
-			}
-
-		}
-
-	}
-/**
- * Method for converting the graph to KML file. 
- * used for presenting the graph on Google Earth.
- * @return kml string of the graph.
- */
+	/**
+	 * Method for converting the graph to KML file. 
+	 * used for presenting the graph on Google Earth.
+	 * @return kml string of the graph.
+	 */
 	public String to_kml() {
 
 		Iterator hit = getV().iterator();
@@ -357,7 +341,7 @@ public class DGraph extends Observable  implements graph, Serializable {
 		StringBuffer graph_kml = new StringBuffer();
 		graph_kml.append("<Folder>\r\n+"
 				+ "      <name>Graph</name>");
-		
+
 		while(hit.hasNext()) {
 			node_data v = (node_data) hit.next();
 			int i=0;
@@ -382,15 +366,15 @@ public class DGraph extends Observable  implements graph, Serializable {
 				"		</LineString>\r\n" + 
 				"	</Placemark>"+
 				"</Folder>\r\n");
-		
+
 
 		return graph_kml.toString();
 	}
-/**
- * private sub method for KML.
- * setting the head of the graph KML code. 
- * @return - string of the KML start lines. 
- */
+	/**
+	 * private sub method for KML.
+	 * setting the head of the graph KML code. 
+	 * @return - string of the KML start lines. 
+	 */
 	private String add_headline_edges() {
 
 		String temp = "<Placemark>\r\n" + 

@@ -26,7 +26,7 @@ import elements.Fruit;
 import elements.NodeV;
 import utils.Point3D;
 /**
- * This class holds implementations of graph_algorithems interface.
+ * This class holds implementations of Algorithems interface.
  * Algorithms: 
  * -----------
  * 			1.init(file.txt) 	 graph from file.txt.
@@ -50,79 +50,16 @@ import utils.Point3D;
 public class Graph_Algo  {
 
 
-
 	////////////////////////////////////////////
 	//////////////    fields     ///////////////
 	////////////////////////////////////////////
-	graph g;
-
-
-	/////////////////////////////////////////////////////////////////
-	///////////////////     Constructor     /////////////////////////
-	/////////////////////////////////////////////////////////////////
-	public Graph_Algo() {}
 
 	private static final double EPS = 0.0000001;
 
-	public Graph_Algo(graph g) {
-		this.g = g;
-	}
-
-
-	public void init(graph g) {
-		this.g = g;	
-	}
 
 	///////////////////////////////////////////////////////////////////////////
 	////////////////////////////       methods        /////////////////////////
 	///////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Initialized graph from file
-	 * @param g
-	 */
-
-	public void init(String file_name) {
-		graph temp = null;
-		try
-		{    
-			FileInputStream file = new FileInputStream(file_name); 
-			ObjectInputStream in = new ObjectInputStream(file);
-			temp = (graph)in.readObject(); 
-			this.init(temp);
-			in.close(); 
-			file.close();
-			System.out.println("Object has been deserialized");
-		}    
-
-		catch(IOException ex) 
-		{     System.out.println("IOException is caught");} 
-
-		catch(ClassNotFoundException ex) 
-		{    System.out.println("ClassNotFoundException is caught");} 
-
-	}
-	/**
-	 * The Method received a String name and save the graph OBJ 
-	 * in given name; 
-	 * @param file_name: Name of the file wished to save in.
-	 */
-
-	public void save(String file_name) {
-		//holds the wished name to save by;
-		String filename = file_name;
-
-		try
-		{    
-			FileOutputStream file = new FileOutputStream(filename); //writing data to file;  
-			ObjectOutputStream out = new ObjectOutputStream(file);  //serilaze the object to the file
-			out.writeObject(this.g); 
-			out.close();   file.close(); 
-			System.out.println("Object has been serialized"); 
-		}   
-		catch(IOException ex) 
-		{   System.out.println("IOException is caught");} 
-	}
 
 
 	/**
@@ -256,7 +193,7 @@ public class Graph_Algo  {
 
 		Collection<node_data> vertex = g.getV(); // getting all vertexes.
 
-		dosecontain(src,dest,vertex);
+		doescontain(src,dest,vertex);
 
 		all_Zero(vertex); //sets tag to 0; )Unvisited; 
 		all_inf(vertex); // sets the path cost to 0; 
@@ -323,7 +260,7 @@ public class Graph_Algo  {
 
 		Collection<node_data> vertex = g.getV(); // getting all vertexes.
 
-		dosecontain(src,dest,vertex);
+		doescontain(src,dest,vertex);
 
 		all_Zero(vertex); //sets tag to 0; )Unvisited; 
 		all_inf(vertex); // sets the path cost to 0; 
@@ -374,10 +311,9 @@ public class Graph_Algo  {
 	 * 
 	 * @param src
 	 * @param dest
-	 * @param prev_id data structure to hold the father of a node in a path. 
+	 * @param prev_id data structure to hold the edges in a path. 
 	 * @return the path src --> destination
 	 */
-
 	private static ArrayList<Edge> createpath_edge(int src, int dest, HashMap<Integer, Integer> prev_id,DGraph g) {
 
 
@@ -435,7 +371,6 @@ public class Graph_Algo  {
 	 * which creating the shortest path between src --> dest extracting the weight of the path.
 	 * @return the cost value (double) of the shortest path src --> dest.   
 	 */
-
 	static public double shortestPathDist(int src, int dest,DGraph g,int pick) {	
 
 		if(g == null) { System.out.println("Graph is empty"); return -1;}
@@ -459,7 +394,6 @@ public class Graph_Algo  {
 	 * which creating the shortest path between src --> dest extracting the path.
 	 * @return the shortest path src --> dest.   
 	 */
-
 	static public List<node_data> shortestPath(int src, int dest,DGraph g) {
 		return DijkstraNode(src, dest,g);
 	}
@@ -469,7 +403,6 @@ public class Graph_Algo  {
 	 * which creating the shortest path between src --> dest extracting the path.
 	 * @return the shortest path src --> dest.   
 	 */
-
 	static public List<Edge> shortestPathEdges(int src, int dest,DGraph g) {
 		return DijkstraEdge(src, dest,g);
 	}
@@ -518,8 +451,6 @@ public class Graph_Algo  {
 			return arr;	
 		}
 	}
-
-
 
 
 
@@ -600,7 +531,7 @@ public class Graph_Algo  {
 		return false;
 	}
 	/**
-	 * takes a list and shuffle randomly the elements positions inside
+	 * takes a list and shuffle randomly the elements positions inside the array.
 	 * @param targets
 	 * @return rearrange form of targets
 	 */
@@ -630,6 +561,12 @@ public class Graph_Algo  {
 
 		return targets;
 	}
+	
+	/**
+	 * Used by Dijkstra. removing duplicated nodes in the Array List.
+	 * @param list
+	 * @return array without duplications. 
+	 */
 
 	static public ArrayList<Integer> removeDuplicates(List<Integer> list) 
 	{ 
@@ -659,7 +596,7 @@ public class Graph_Algo  {
 	 * @param vertex - Coleection of all the Vertexes in the graph. 
 	 * @return true/false if the there is a edge between source and destination vertexes.
 	 */
-	static private boolean dosecontain(int src, int dest, Collection<node_data> vertex) {
+	static private boolean doescontain(int src, int dest, Collection<node_data> vertex) {
 
 		Iterator hit = vertex.iterator();
 		boolean a=false; boolean b=false; 
@@ -674,7 +611,6 @@ public class Graph_Algo  {
 
 		else
 			return true;
-
 	}
 /**
  * calculate the length of an edge by the coordinates of x,y of the two vertexes
@@ -728,7 +664,7 @@ public class Graph_Algo  {
 	 * @param type		- fruit type
 	 * @return			- boolean true/false if the fruit is on this edge.
 	 */
-	public static boolean isOn(Edge dest ,Point3D fruit_pos, double type) {
+	private static boolean isOn(Edge dest ,Point3D fruit_pos, double type) {
 
 		if(dest.getSrcNode().getKey() < dest.getDestNode().getKey() &&  type == -1) {
 			return false;

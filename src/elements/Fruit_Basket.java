@@ -83,6 +83,7 @@ public class Fruit_Basket {
 		return fruitBuffer.toString();
 		
 	}
+	
 	/**
 	 * During the game this method will refresh the fruits container. 
 	 * add or remove new / old fruits. 

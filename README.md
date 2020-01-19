@@ -1,6 +1,9 @@
 
 # README - Smurffing Around
 
+
+![serie2](https://user-images.githubusercontent.com/57361655/72688652-0ce4e900-3b12-11ea-8b74-95966ec6b379.jpg)
+
 This project is a mini-game build for OOP class at Ariel University.
 Using a server that manage the game an contain level (0-23) the user can pick a level to play and should it be an automated game (using algorithm) or a manual.
 After playing the user will also have the option to export the game to KML then show the game played on google earth, the graph will be shown on Ariel landscape and the game will run around the university and the city.

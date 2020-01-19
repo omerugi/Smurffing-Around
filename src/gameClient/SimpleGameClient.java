@@ -45,18 +45,27 @@ import utils.kmlmaker;
  *
  */
 public class SimpleGameClient extends Observable implements Runnable {
-
+	//fruit Basket object
 	 Fruit_Basket fruits;
+	 //Array list of the robots
 	 ArrayList<robot> robots_list;
+	 //Auto Game  - data structure of robots and paths in a hash, used for the robots paths.
 	 HashMap<Integer, Queue<Edge>> robot_final_dest1 = new HashMap<Integer, Queue<Edge>>();
+	 //Menual Game -  data structure of robots and paths in a hash, used for the robots paths.
 	 HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
 	 ArrayList<Double> final_dest_len = new ArrayList<Double>();
+	 //used for the user choices. 
 	 boolean flag = true;
+	 //KML file.
 	 kmlmaker kml;
 	
 	public  void test1() {
 
-
+//////////////////////////////////////////////////Game set up///////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		
+		
+		
 		//////////////////////Variables hold the game setting////////////////////////// 
 		JFrame frame = null; int Level_chooser = 0; int GameType_chooser = 0;
 		boolean flag = true;
@@ -71,13 +80,11 @@ public class SimpleGameClient extends Observable implements Runnable {
 		///////////////////////////////Choose level//////////////////////////////////
 		Object[] possibilities2 = {"0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
 		String s2 = (String)JOptionPane.showInputDialog(frame,"pick game","Choose Game Level:", JOptionPane.PLAIN_MESSAGE,null ,possibilities2,  "");
-		try {
-		Level_chooser =Integer.parseInt(s2);
-		flag = false;
+		try {Level_chooser =Integer.parseInt(s2);flag = false;
 		}catch (Exception e) {};
 		}
+		
 		game_service game = Game_Server.getServer(Level_chooser); //peek the level from server. 
-
 		String graph_string = game.getGraph();					 //Getting the level map(graph). 
 
 		/////////////////////////////initializing the graph//////////////////////////
@@ -89,26 +96,23 @@ public class SimpleGameClient extends Observable implements Runnable {
 		kml = kmlmaker.get_kmlmaker();
 		kml.add_kml(dgraph.to_kml());
 
+		initRobots(game,dgraph); //creating the robots. 
 
-		////////////////////////////Loading the information from the Json String given by the server/////////////////////////////
-	
-		initRobots(game,dgraph);
+		
+		/////////////////////////////////////////////////////////////////Game set up End/////////////////////////////////////////////////////////////////////////////
+		
+		
 
+		////Start Automatic Game/////
+		 if			(GameType_chooser == 0){	PlayAuto(dgraph,game);   }//game is running...
+		
+		////Start   manual  Game/////
+		 else if	(GameType_chooser == 1) {	playMenual(dgraph,game); }//game is running...
+		
 
-		////Open a manual Game/////
-		if(GameType_chooser == 1) {
-			playMenual(dgraph,game); 
-			//game is running...
-		}
-
-
-		////Open a Automatic Game/////
-		else {
-
-			PlayAuto(dgraph,game);
-			//game is running...
-		}
-
+		 //----------------------------------------------------------------------------------------------------------------------//
+		 
+		 
 
 		//Print the Game results//
 		String results = game.toString();

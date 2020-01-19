@@ -42,7 +42,10 @@ public interface edge_data {
 	 * @param t - the new value of the tag
 	 */
 	public void setTag(int t);
-	
+	/**
+	 * 
+	 * @return string of the edge coordinates.
+	 */
 	public String cord_kml();
 	
 }

@@ -59,7 +59,9 @@ public interface node_data {
 	
 	public void setTag(int t);
 	
-	
+	/**
+	 * @return - the vertex meta data in kml form.
+	 */
 	public String to_kml();
 	
 }

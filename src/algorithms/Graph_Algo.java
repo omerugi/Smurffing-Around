@@ -300,6 +300,25 @@ public class Graph_Algo  {
 	}
 
 
+	/**
+	 * Dijkstra:
+	 * Given a graph and a source vertex in the graph, find shortest paths from source to all vertices in the given graph.
+	 * Base:
+	 * setting all vertexes weight to INF and tag them 0 - Unvisited; 
+	 * --------------------------------------------------------------
+	 * Algo: 
+	 * Extract the first src node and set his weight to 0 (The cost of path from src to src is zero); 
+	 * Using a Min heap add src to heap; 
+	 * 
+	 * The Algo Will Resume as followed: 
+	 * for each iteration the top off the Min heap node will represents the shortest path from src by weight. 
+	 * the algorithm works as a greedy algorithm which will move forwards in the least "expensive" path until reach the 
+	 * Destination node. 
+	 * in the end the shortest path will send to create path method and returns a Array List of edges contained the path itself. 
+	 * @param src start point.
+	 * @param dest end point . 
+	 * @return shortest path between src & dest. 
+	 */
 	private static ArrayList<Edge> DijkstraEdge(int src, int dest,DGraph g){
 
 		Collection<node_data> vertex = g.getV(); // getting all vertexes.
@@ -346,6 +365,18 @@ public class Graph_Algo  {
 
 	}
 
+
+	/**
+	 * 
+	 * iterates from destination node backwards by using the prev_id to determine the 
+	 * father of the node in the path. 
+	 * when its reaches src as the prev_id it returns the path as Array List of Edges; 
+	 * 
+	 * @param src
+	 * @param dest
+	 * @param prev_id data structure to hold the father of a node in a path. 
+	 * @return the path src --> destination
+	 */
 
 	private static ArrayList<Edge> createpath_edge(int src, int dest, HashMap<Integer, Integer> prev_id,DGraph g) {
 
@@ -621,6 +652,13 @@ public class Graph_Algo  {
 		return newList; 
 	} 
 
+	
+	/**
+	 * @param src 	 - edge source node. 
+	 * @param dest 	 - edge destination node.
+	 * @param vertex - Coleection of all the Vertexes in the graph. 
+	 * @return true/false if the there is a edge between source and destination vertexes.
+	 */
 	static private boolean dosecontain(int src, int dest, Collection<node_data> vertex) {
 
 		Iterator hit = vertex.iterator();
@@ -638,12 +676,29 @@ public class Graph_Algo  {
 			return true;
 
 	}
-
+/**
+ * calculate the length of an edge by the coordinates of x,y of the two vertexes
+ * in the edge.      
+ * @param x1 - source		 x1 coordinate
+ * @param x2 - destination 	 Y1 coordinate
+ * @param y1 - source		 x2 coordinate
+ * @param y2 - destination 	 Y2 coordinate
+ * @return the length between the vertexes
+ */
 	private static double CalcLen(double x1, double x2, double y1,double y2) {
 		//d=((x1-x2)^2+(y1-y2)^2)
 		return Math.sqrt(Math.pow((x1-x2),2)+Math.pow((y1-y2),2));
 	}
 
+	
+	/**
+	 * Going through the Graph edges. 
+	 * the method returns the edge which the fruit is on it. 
+	 * @param gg 		- 			graph
+	 * @param fruit_pos -			fruit 3D position (x,y,z coordinates); 	
+	 * @param type      - 			fruit type. 
+	 * @return			-			the edge which the fruit is. 
+	 */
 	public static Edge EdgeForFruit(DGraph gg, Point3D fruit_pos, double type) {
 
 		Iterator hit = gg.getV().iterator();
@@ -666,6 +721,13 @@ public class Graph_Algo  {
 		return null;
 	}
 
+	/**
+	 * sub method to determined which edge the fruit is on. 
+	 * @param dest		- edge from the graph
+	 * @param fruit_pos - fruit 3D position (x,y,z coordinate)
+	 * @param type		- fruit type
+	 * @return			- boolean true/false if the fruit is on this edge.
+	 */
 	public static boolean isOn(Edge dest ,Point3D fruit_pos, double type) {
 
 		if(dest.getSrcNode().getKey() < dest.getDestNode().getKey() &&  type == -1) {
@@ -735,7 +797,10 @@ public class Graph_Algo  {
 			prev.put(v.getKey(), prev_id);
 			add_heapfyup(v);
 		}
-
+		/**
+		 * adding to heap. 
+		 * @param v
+		 */
 		private void add_heapfyup(node_data v) {
 			heap.add(v);
 			int index = heap.size()-1;
@@ -754,7 +819,13 @@ public class Graph_Algo  {
 			}
 
 		}
-
+/**
+ * updating the edge weight.
+ * @param v
+ * @param w
+ * @param prev_id
+ * @param prev
+ */
 		private void updatew(node_data v, double w,int prev_id,HashMap<Integer, Integer> prev) {
 			if(w < v.getWeight()) {
 				v.setWeight(w);
@@ -772,7 +843,11 @@ public class Graph_Algo  {
 			heapfy_down();
 			return pop;
 		}
-
+/**
+ * swap method.
+ * @param a
+ * @param b
+ */
 		private void swap(int a ,int b) {
 			node_data temp = heap.get(a);
 			heap.set(a, heap.get(b));

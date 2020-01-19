@@ -6,35 +6,61 @@ import java.util.List;
 import elements.Edge;
 import elements.Fruit;
 
+/**
+ * MinHeap Data Structure: 
+ * 
+ * this data structure will contain node_data obj.
+ * and sort them by the node_data and the fruits weight. 
+ * 
+ * will support the MinHeap methods: 
+ * push , pop , peek .
+ * uses heapyup & heapyfudown for rearranging positions in the tree. 
+ * 
+ */
 
 public class MinHeap{
 
-	
+	/**
+	 * node class contains the fields: 
+	 * 
+	 * Double getPathDist - will hold the path valued
+	 * Array of Objects   - the path itself 
+	 * Fruit 			  - The fruit which the path is set to. 
+	 */
 	public class node{
 		double getPathDist;
 		Object [] path;	
 		Fruit fruit;
-		
+		/**
+		 * Constructor
+		 */
 		public node(Object [] path, Fruit fruit) {
 			this.getPathDist = (double) path[0];
 			this.path = path;	
 			this.fruit = fruit;
 		}
-
+		/**
+		 * returns the path valued.
+		 * @return path value in Double. 
+		 */
 		public double getPathDist() {
 			return (double) path[0];
 		}
-
+		/**
+		 * @return the path itself in edges 
+		 */
 		public List<Edge> getPath() {
 			return (List<Edge>) path[1];
 		}
-		
+		/**
+		 * @return the fruit the path sets to. 
+		 */
 		public Fruit getFruit() {
 			return fruit;
 		}
 
 	}
-	
+	//will holds the path. 
 	ArrayList<node> heap;
 
 	public MinHeap () {
@@ -48,7 +74,9 @@ public class MinHeap{
 			heap.add(temp.get(i));
 		}
 	}
-
+	/**
+	 * @return the heap containing the paths.  
+	 */
 	private ArrayList<node> getList() {
 		return heap;
 	}
@@ -58,7 +86,9 @@ public class MinHeap{
 		node new_e = new node(path,fruit);
 		add_heapfyup(new_e);
 	}
-
+	/**
+	 * @param new_e adding vertex to the heap.
+	 */
 	private void add_heapfyup(node new_e) {
 
 		heap.add(new_e);
@@ -79,7 +109,9 @@ public class MinHeap{
 		}
 
 	}
-
+/**
+ * @return the top shortest path in the heap. 
+ */
 	public node pop() {
 
 		node temp = heap.get(0);
@@ -89,13 +121,18 @@ public class MinHeap{
 		heapfy_down();
 		return pop;
 	}
-
+/**
+ * simple nodes swap method. 
+ */
 	private void swap(int a ,int b) {
 		node temp = heap.get(a);
 		heap.set(a, heap.get(b));
 		heap.set(b, temp);
 	}
-
+/**
+ * heapify down method. 
+ * rearranging the heap. 
+ */
 	private void heapfy_down() {
 
 		int right 		=2;
@@ -139,7 +176,9 @@ public class MinHeap{
 			{swap(movingindex,left);}
 		}
 	}
-
+/**
+ * prints the heap variables. 
+ */
 	public String toString() {
 		String print = "[";
 		for (int i = 0; i <heap.size(); i++) {
@@ -151,19 +190,27 @@ public class MinHeap{
 		print+="]";
 		return print;
 	}
-
+/**
+ * @return boolean indicates if the heap is empty or not.
+ */
 	public boolean isEmpty() {
 		return heap.isEmpty();
 	}
-
+/**
+ * @return a peek to the top element in the heap. 
+ */
 	public node peek() {
 		return heap.get(0);
 	}
-	
+/**
+ * @return the fruit of the path in the top path in the heap.
+ */
 	public Fruit fruitpeek() {
 		return heap.get(0).getFruit();
 	}
-	
+/**
+ * @return path length (value);
+ */
 	public double lenPeek() {
 		return heap.get(0).getPathDist();
 	}

@@ -121,7 +121,9 @@ public class NodeV implements node_data, Serializable {
 	public static void reset_count() {
 		id = 0;
 	}
-	
+	/**
+	 * creating a KML form of the vertex as PlaceMark. 
+	 */
 	public String to_kml() {
 		
 		String temp = " <Placemark>\r\n" + 

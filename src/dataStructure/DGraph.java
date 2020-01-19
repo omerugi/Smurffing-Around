@@ -53,9 +53,12 @@ public class DGraph extends Observable  implements graph, Serializable {
 	/////////////////////////////////////////////////////////////////
 	///////////////////     Constructor     /////////////////////////
 	/////////////////////////////////////////////////////////////////
-
+	//Default Constructor. 
 	public DGraph() {}
-
+	/**
+	 * initialized graph using a txt string.  
+	 * @param file_name - txt file holds graph.
+	 */
 	public DGraph(String file_name)
 	{
 		try {
@@ -94,7 +97,10 @@ public class DGraph extends Observable  implements graph, Serializable {
 	////////////////////////////       methods        /////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-
+/**
+ * sub method for initialized graph from Json String 
+ * @param jsonSTR 
+ */
 	public void init(String jsonSTR)
 	{
 		try {
@@ -337,7 +343,11 @@ public class DGraph extends Observable  implements graph, Serializable {
 		}
 
 	}
-
+/**
+ * Method for converting the graph to KML file. 
+ * used for presenting the graph on Google Earth.
+ * @return kml string of the graph.
+ */
 	public String to_kml() {
 
 		Iterator hit = getV().iterator();
@@ -376,7 +386,11 @@ public class DGraph extends Observable  implements graph, Serializable {
 
 		return graph_kml.toString();
 	}
-
+/**
+ * private sub method for KML.
+ * setting the head of the graph KML code. 
+ * @return - string of the KML start lines. 
+ */
 	private String add_headline_edges() {
 
 		String temp = "<Placemark>\r\n" + 

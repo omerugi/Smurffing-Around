@@ -7,7 +7,11 @@ import java.util.StringTokenizer;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
-
+/**
+ * Class Edge: 
+ * 
+ * this class will Constructs the Edges Objects of the graph. 
+ */
 
 public class Edge implements edge_data, Serializable{
 
@@ -21,10 +25,8 @@ public class Edge implements edge_data, Serializable{
 	double w;
 	int tag=0;
 	double length = 0;
-	double x1 ;
-	double y1 ;
-	double x2 ;
-	double y2 ;
+	double x1 ;	double y1 ;
+	double x2 ;	double y2 ;
 	private final double EPS = 0.0000001;
 	
 	
@@ -68,7 +70,9 @@ public class Edge implements edge_data, Serializable{
 	public int getDest() {
 		return this.dest.getKey();
 	}
-	
+	/**
+	 * @return the edge source Vertex
+	 */
 	public node_data getSrcNode() {
 		return this.src;
 	}
@@ -79,7 +83,9 @@ public class Edge implements edge_data, Serializable{
 	public node_data getDestNode() {
 		return this.dest;
 	}
-	
+	/**
+	 * @return edge length. destance between source --> to destination .
+	 */
 	public double getlength() {
 		return this.length;
 	}
@@ -95,7 +101,6 @@ public class Edge implements edge_data, Serializable{
 	/**
 	 * Will return the starting point end and weight of the edge.
 	 */
-
 	@Override
 	public String getInfo() {
 
@@ -114,7 +119,18 @@ public class Edge implements edge_data, Serializable{
 	public void setTag(int t) {
 		this.tag=t;
 	}
-	
+	/**
+	 * calculates if a fruit is on the edge or not method. 
+	 * using the fruit x , y coordinates calculates the length between the fruit 
+	 * to the two vertexes constructing the edge.
+	 * 
+	 * if the sum of distance from the fruit to the two edge vertexes is equal to the 
+	 * length of the edge in a slight deviation of EPSILON it returns true.  
+	 * @param x			- fruit x coordinate
+	 * @param y			- fruit y coordinate
+	 * @param type		- fruit type
+	 * @return 			- boolean if a point (fruit usage) is on the edge. 
+	 */
 	public boolean isOn(double x, double y, double type) {
 		
 		if(src.getKey() < dest.getKey() &&  type == -1) {
@@ -130,7 +146,9 @@ public class Edge implements edge_data, Serializable{
 		}
 		return false;
 	}
-	
+	/**
+	 * returns a String of the coordinates of the edge .
+	 */
 	public String cord_kml() {
 		
 		String temp = ""+

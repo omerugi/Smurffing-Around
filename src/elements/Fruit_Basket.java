@@ -16,10 +16,20 @@ import dataStructure.edge_data;
 import dataStructure.node_data;
 import utils.Point3D;
 
+
+/**
+ * Class Fruit Basket: 
+ * 
+ * This class will hold the fruit objects in a data Structure.  
+ * Will be use as a container of fruit objects. 
+ *
+ */
 public class Fruit_Basket {
 
-	ArrayList <Fruit> fruits = new ArrayList<Fruit>();; 
-	StringBuffer fruitBuffer = new StringBuffer();
+	ArrayList <Fruit> fruits = new ArrayList<Fruit>(); // Array list of fruits ( the container )  
+	StringBuffer fruitBuffer = new StringBuffer();    // String buffer - will contain the fruits in a KML String. 
+	
+	//
 	public Fruit_Basket () {
 		start_kml();
 	}
@@ -46,7 +56,10 @@ public class Fruit_Basket {
 		}	
 		start_kml();
 	}
-	
+	/**
+	 * Private method - used for constructing the head 
+	 * lines of the fruits folder for the Kml file
+	 */
 	private void start_kml() {
 		
 		fruitBuffer.append(Fruit.init_Kml());
@@ -54,7 +67,10 @@ public class Fruit_Basket {
 				"      <name>fruits</name>";
 		fruitBuffer.append(temp);
 	}
-	
+	/**
+	 * Public method - used for constructing the tail 
+	 * lines of the fruits folder for the Kml file.
+	 */
 	public String end_kml() {
 		
 		for (int i = 0; i < fruits.size(); i++) {
@@ -67,7 +83,12 @@ public class Fruit_Basket {
 		return fruitBuffer.toString();
 		
 	}
-	
+	/**
+	 * During the game this method will refresh the fruits container. 
+	 * add or remove new / old fruits. 
+	 * @param game	- the game service 
+	 * @param gg	- game graph. 
+	 */
 	public void update(game_service game, DGraph gg) {
 		
 		Fruit_Basket temp = new Fruit_Basket(game,gg);
@@ -99,7 +120,13 @@ public class Fruit_Basket {
 		
 	}
 
-	
+	/**
+	 * simple method used for check if a fruit is contained in the fruit container. 
+	 * @param fruit_pos	- x,y coordinates
+	 * @param type		- fruit type
+	 * @param value		- fruit value
+	 * @return	true/false if the fruit is contained in the fruit container. 
+	 */
 	private boolean contains(Point3D fruit_pos, double type, double value ) {
 		for (int i = 0; i < this.fruits.size(); i++) {
 			if(fruits.get(i).getLocation().x()==fruit_pos.x() 
@@ -109,20 +136,30 @@ public class Fruit_Basket {
 		}
 		return false;
 	}
-	
+	/**
+	 * @return the content of the fruit container
+	 */
 	public ArrayList <Fruit> gerFruitList() {
 		return fruits;
 	}
-	
+	/**
+	 * @return how many fruits are in the container 
+	 */
 	public int getLen() {
 		return fruits.size();
 	}
-	
+	/**
+	 * @param i - position in the container .
+	 * @return -returns the fruit in the i'th position in the container
+	 */
 	public Fruit getFruit(int i) {
 		if(i>=fruits.size()) {return null;}
 		return fruits.get(i);
 	}
 	
+	/**
+	 * @return fruit with the maximum value in the container 
+	 */
 	public Fruit getMax() {
 		
 		Fruit temp= new Fruit();

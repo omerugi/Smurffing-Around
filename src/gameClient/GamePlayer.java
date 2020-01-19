@@ -135,7 +135,7 @@ public class GamePlayer extends Observable implements Runnable {
 	private  void PlayAuto() {
 
 		//Open the Game window display (GUI)
-		GUI gui = new GUI(dgraph,game,0);	//open the GUI frame. 
+		GUI gui = new GUI(dgraph,game,Level_chooser);	//open the GUI frame. 
 		gui.setVisible(true);		
 
 		game.startGame();			 		// Commend the game server to start the game. 
@@ -144,7 +144,7 @@ public class GamePlayer extends Observable implements Runnable {
 		long first = System.currentTimeMillis();
 		while(  game.timeToEnd()/100!=0 ) {
 
-			if((game.timeToEnd()/50)%2==0) {
+			if((game.timeToEnd()/50)%1==0) {
 				AutomoveRobots();
 				gui.repaint();}
 
@@ -152,7 +152,6 @@ public class GamePlayer extends Observable implements Runnable {
 				first = System.currentTimeMillis();
 			}
 		}
-		System.out.println();
 	}
 
 	long update_time =System.currentTimeMillis();
@@ -320,14 +319,17 @@ public class GamePlayer extends Observable implements Runnable {
  */
 	private  void playMenual() {
 		//open a GUI frame. 
-		GUI gui = new GUI(dgraph,game,1);
+		GUI gui = new GUI(dgraph,game,Level_chooser);
 		gui.setVisible(true);
 		
 		game.startGame(); //start the game.
 
 		while(game.isRunning()) { // while there is more time in the game move the robots.
+			
+			if((game.timeToEnd()/10)%2 ==0) {
 			moveRobotsM();
 			gui.repaint();
+			}
 		}
 
 	}
@@ -339,23 +341,23 @@ public class GamePlayer extends Observable implements Runnable {
 
 		List<String> log = game.move();
 		
-		int d_choosen = -1;
-		if(log!=null) {
+		int d_choosen = -1; 				//destination chosen by user.
+		if(log!=null) {	
+			
+			updateRobots(game,dgraph,log);  //update --> robot info. 
+			fruits.update(game, dgraph);	//update --> fruit basket. 
 
-			updateRobots(game,dgraph,log);
-			fruits.update(game, dgraph);
-
-			for(int i=0;i<log.size();i++) {
+			for(int i=0;i<log.size();i++) {	//adding robots to the hash .	
 				if(!robot_final_dest1.containsKey(i)) {
-					robot_final_dest1.put(i, null);
+					robot_final_dest1.put(i, null); // if the robot does'nt have path in the hash just put null ;
 				}
 
 			}
-
+			// go through all the robots in the hash.
+			// if robot i does'nt have path open a new frame for user input. 
 			for (int i = 0; i < robots_list.size(); i++) {
-
 				if(robot_final_dest.get(i)==null) {
-
+					//opening a frame dialog for the user <--
 					while (flag==true) {
 						try {
 							String temp1= JOptionPane.showInputDialog(frame,"Enter Dest ID for ROBOT "+i);
@@ -363,52 +365,54 @@ public class GamePlayer extends Observable implements Runnable {
 								d_choosen =Integer.parseInt(temp1);	
 								if(dgraph.getNode(d_choosen)!=null) {flag=false; continue;}
 							}	System.out.println("dest Not Valid");
-						}catch (Exception e) {System.out.println("MSMS");}		
+						}catch (Exception e) {System.out.println("Error");}		
 					}flag=true;
-
+					//after getting the user destination input the shortest path for this robot to the user
+					//desire to a new queue.
 					List<node_data> temp = Graph_Algo.shortestPath(robots_list.get(i).getSrc(), d_choosen, dgraph);
 					Queue<node_data> e = new LinkedList<node_data>(temp);
 					e.remove();
-					e.add(dgraph.getNode(d_choosen));
-					robot_final_dest.put(i, e);
+					e.add(dgraph.getNode(d_choosen));//get the node from the graph
+					robot_final_dest.put(i, e); //put the path in the hash queue. 
 				}
 			}
-
+			//advanced the robot in the path to the destination chosen by user 
 			for (int i = 0; i < robots_list.size(); i++) {
-
-				if(robots_list.get(i).getDest() ==-1) {
-
-					node_data e = robot_final_dest.get(i).remove();
-
-					if(robot_final_dest.get(i).size() == 0) {
+				if(robots_list.get(i).getDest() ==-1) { //if the robot finished an edge
+					
+					node_data e = robot_final_dest.get(i).remove();	//remove the edge from the queue 
+					
+					if(robot_final_dest.get(i).size() == 0) { //if the queue is empty set the path to null
 						robot_final_dest.put(i, null);
 					}
-
-					double temp = final_dest_len.get(i);
-
-					game.chooseNextEdge(robots_list.get(i).getId(), e.getKey());
-					System.out.println(game.timeToEnd()/1000);
+					game.chooseNextEdge(robots_list.get(i).getId(), e.getKey()); //send to the server the robot next step. 
 				}
 			}
-
-
 		}
-
 	}
 
-
+/**
+ * thread method
+	
+ */
 	@Override
 	public void run() {
 		test1();
 
 	}
+	
+	/**
+	 * Updating the kml file with all the robots kml's data.
+	 */
 	private void Updating_kml() {
 		for (int i = 0; i < robots_list.size(); i++) {kml.add_kml(robots_list.get(i).stringTokml());} 
 		kml.add_kml(fruits.end_kml());
 
 	}
 
-
+/*
+ * pop a frame in the end of the game to save the game to a kml file. 
+ */
 	private void kml_save_framePOP() {
 		Object[] possibilities21 = {"YES" , "NO"};
 		String s4 =  (String)JOptionPane.showInputDialog(frame,"would you like to save?","Save Panel", JOptionPane.PLAIN_MESSAGE,null ,possibilities21,  "");
@@ -425,7 +429,12 @@ public class GamePlayer extends Observable implements Runnable {
 		}
 	}
 
-
+/**
+ * this method in charge of the UI choice of the game type :
+ *  1.manual or automate.
+ *  2.game Level.
+ *  update the game <--
+ */
 	private void GameType_GameLevel() {
 		boolean flag = true;
 		while (flag) {
@@ -446,6 +455,4 @@ public class GamePlayer extends Observable implements Runnable {
 		String graph_string = game.getGraph();					 //Getting the level map(graph). 
 
 	}
-
-
 }

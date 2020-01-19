@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.sql.Time;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.sun.org.apache.xerces.internal.impl.xs.opti.DefaultXMLDocumentHandler;
+
 import Server.game_service;
 import dataStructure.edge_data;
 import dataStructure.graph;
@@ -50,6 +54,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	List<node_data> path;
 	int [][] robotsDialog;
 	Graphics doubleD; 
+	int Level;
+	Graphics2D g4;
 	/////////////////////////////////////////////////////////////////
 	/////////////////////GUI_window_fields//////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -61,7 +67,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 
 	private int defultx = 1800;	private int defulty = 900;
-	
+
 	//control action for paint//
 	int action=0;
 
@@ -85,13 +91,14 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		((Observable) graph).addObserver(this);
 	}
 
-	public GUI(graph dg, game_service game,int Auto_Menual)
+	public GUI(graph dg, game_service game,int gamechooser)
 	{
 		initGUI();
 		this.game = game; 
 		this.vertex	= dg.getV();
 		this.graph = dg;
 		((Observable) graph).addObserver(this);
+		this.Level= gamechooser;
 	}
 
 	/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -99,11 +106,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	//////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	private void initGUI() {
-		
-		
+
+
 		this.setSize(defultx,defulty);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		ImageIcon ImageIcon5 = new ImageIcon("data\\GameIcon.jpg");
 		Image GameIcon  =	ImageIcon5.getImage();
 		this.setIconImage(GameIcon);
@@ -150,28 +157,29 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	private BufferedImage buff;
 	private  Graphics2D g2;
 	private BufferedImage buff3;
-	private  Graphics2D g3;
 
 	JLabel background = null;
 	//////////////////////////////////////////////Paint///////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void paint(Graphics g)
 	{	
-		
-		//call paint func\\
+
+		/**
+		 * double buffering section---
+		 */
 		if(buff == null || g2 == null || (this.WIDTH != defultx || this.HEIGHT != defulty )) {
-			
+
 			if((this.WIDTH != defultx || this.HEIGHT != defulty) && background != null ) {
 				remove(background);
 			}
-			
+			//set background
 			setLayout(null);
 			ImageIcon img = new ImageIcon("data\\background.jpg");
 			background = new JLabel("", img ,JLabel.CENTER);
 			background.setBounds(0,0, defultx-17, defulty-40);
-			
+
 			add(background);
-			
+
 			defultx = this.getWidth();
 			defulty = this.getHeight();
 			settings();
@@ -181,19 +189,17 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 			paintgraph(g2);
 		}
 
-		Graphics g2_comp = (Graphics2D)g;
-		g2_comp.drawImage(buff,0,0,null);
-			
-		paintsmurfs(g2_comp);
-	
-		paintrobotsAuto(g2_comp);
-		
-		if(game.timeToEnd()/100<1) {	
+		g4 = (Graphics2D)g; 	g4.drawImage(buff,0,0,null);
+
+		paintsmurfs();		paintGargamels();
+
+		if(game.timeToEnd()/10<1) {	
 			ImageIcon GameOver = new ImageIcon("GameOver.png");
 			Image  GameOver1  = GameOver.getImage();
 			g.drawImage(GameOver1, 0, 0,defultx-17, defulty-40, this);
 		}
 	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////EndPaint//////////////////////////////////////////////////////////////
 
@@ -243,52 +249,32 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 	@Override
 	public void mouseClicked(MouseEvent e) {}
-
 	@Override
 	public void mouseEntered(MouseEvent e) {}
-
 	@Override
 	public void mouseExited(MouseEvent e) {}
-
 	@Override
-	public void mousePressed(MouseEvent e) {
-
-		int x = e.getX();
-		int y = e.getY();
-
-
-		System.out.println("x:" +x+""+y);
-
-	}
-
+	public void mousePressed(MouseEvent e) {}
 	@Override
 	public void mouseReleased(MouseEvent e) {}
-
 	@Override
-	public void actionPerformed(ActionEvent e) 
-	{}
-
+	public void actionPerformed(ActionEvent e){}
 	@Override
 	public void run() {
-		repaint();
-	}
-
-
+		repaint();}
 	@Override
 	public void update(Observable o, Object arg) {
-		repaint();
-		run();
-	}
+		repaint();run();}
 
 	////////////////////////////////////////////Graph Paint////////////////////////////////////////////////////////////////////////
 	private void paintgraph(Graphics g) {
-		
+
 		super.paintComponents(g);
 		Graphics2D g4 = (Graphics2D) g;
-	
-		
+
+
 		g.setColor(Color.blue);
-		
+
 		Iterator hit = vertex.iterator();
 		while(hit.hasNext()) {
 			//sets the line thickness
@@ -296,8 +282,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 			//sets the txt size 
 			float f=13.0f; // font size.
 			g4.setFont(g4.getFont().deriveFont(f));
-		
-			
+
+
 			/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 			////////////////creating the vertex on Screen \\\\\\\\\\\\\\\\\\\\\\\\\
 			node_data v = (node_data) hit.next();
@@ -336,11 +322,11 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 				g.setColor(Color.MAGENTA);
 				g.drawString(df2.format(w),((x1*1)/3)+((x2*2)/3),((y1*1)/3)+((y2*2)/3));	
 			}
-			
+
 		}
 		/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		//////////////////////Painting the Vertexes\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-		
+
 		Iterator hit3 = vertex.iterator();
 		while(hit3.hasNext()) {
 
@@ -351,28 +337,44 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 			ImageIcon SmurfsHouse = new ImageIcon("data\\SmurfsHouse.png");
 			Image  SmurfsHouse1  = SmurfsHouse.getImage();
 			g.drawImage(SmurfsHouse1, xv-25 ,yv-25,35,35, this);
-			
+
 			g.setColor(Color.BLACK);
 			float f=20.0f; // font size.
-			
+
 			g4.setFont(g4.getFont().deriveFont(f));
 			g.drawString(""+v.getKey(),xv-9,yv+3);
-			
-			ImageIcon Score = new ImageIcon("data\\Score.png");
-			Image  Score1  = Score.getImage();
-			g.drawImage(Score1, 60, 60,300,300, this);
-			
-		
+
 		}
 
+		ImageIcon Score = new ImageIcon("data\\Score.png");
+		Image  Score1  = Score.getImage();
+		g.drawImage(Score1, (int)(defultx*0.0313), (int)(defulty*0.075),(int)(defulty*0.273),(int)(defulty*0.273), this);
+
+		
+		ImageIcon sd = new ImageIcon("data\\GameBoard.png");
+		Image  sd1  = sd.getImage();
+		g.drawImage(sd1, (int)(defultx*0.85),(int)(defulty*0.76),(int)(defulty*0.233),(int)(defulty*0.233), this);
+		
+		Graphics2D G = (Graphics2D)g;
+		float f=26.0f; // font size.
+		G.setFont(G.getFont().deriveFont(f));
+		G.drawString("Time-Left    "+game.timeToEnd()/1000,(int)(defultx*0.857),(int)(defulty*0.842));
+		
+		G.drawString("Level:       "+this.Level,(int)(defultx*0.857),(int)(defulty*0.865));
+		
+		g4.setColor(Color.BLACK);
+		f=35.0f; // font size.
+		g4.setFont(g4.getFont().deriveFont(f));
+		g4.drawString("Score:", (int)(defultx*0.070), (int)(defulty*0.24));
+		
 	}
 
 	///////////////////////////////////////////////////Paint Graph End////////////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////Paint smurfs///////////////////////////////////////////////////////////
-	private void paintsmurfs(Graphics g) {
+	private void paintsmurfs() {
 		List<String> Fruit = game.getFruits();
-		
+
 		for (int j = 0; j < Fruit.size(); j++) {
 
 			try {
@@ -387,27 +389,27 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 				double x = Double.parseDouble(st1.nextToken());
 				double y = Double.parseDouble(st1.nextToken());
-				
+
 				ImageIcon DardasAba = new ImageIcon("data\\Dardasaba.png");
 				Image  DardasAba1  = DardasAba.getImage();
 				ImageIcon Dardasit = new ImageIcon("data\\Dardasit.png"); 
 				Image  Dardasit1   =	Dardasit.getImage();
 
 				if(type == -1) {
-					g.drawImage(DardasAba1, reallocX(x)-30, reallocY(y)-30,50,50, this);
+					g4.drawImage(DardasAba1, reallocX(x)-30, reallocY(y)-30,50,50, this);
 				}
 				else {
-					g.drawImage(Dardasit1, reallocX(x)-30, reallocY(y)-30,50,50, this);
+					g4.drawImage(Dardasit1, reallocX(x)-30, reallocY(y)-30,50,50, this);
 				}
 			} catch (JSONException e) {e.printStackTrace();}
 		}
 	}
 	///////////////////////////////////////////////////Paint smurfs End//////////////////////////////////////////////////////
-	private void paintrobotsAuto(Graphics g) {
+	private void paintGargamels() {
 		List<String> ArnoldSchwarzenegge = game.getRobots();
 		int _score =0;
 		for (int j = 0; j < ArnoldSchwarzenegge.size(); j++) {
-			
+
 			try {
 				JSONObject obj = new JSONObject(ArnoldSchwarzenegge.get(j));
 				JSONObject ff = obj.getJSONObject("Robot");
@@ -417,30 +419,26 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 				int score = ff.getInt("value");
 				_score += score;
 				StringTokenizer st1 = new StringTokenizer(pos, ","); 
-				
+
 				double x = Double.parseDouble(st1.nextToken());
 				double y = Double.parseDouble(st1.nextToken());
 
 				ImageIcon Gargamel = new ImageIcon("data\\Gargamel.png");
 				Image  Gargamel1  = Gargamel.getImage();
-				g.drawImage(Gargamel1, reallocX(x)-30, reallocY(y)-30,80,80, this);
-				g.setColor(Color.RED);
-				g.drawString(""+rid, reallocX(x)-20, reallocY(y)-20);
+				g4.drawImage(Gargamel1, reallocX(x)-30, reallocY(y)-30,80,80, this);
+				g4.setColor(Color.RED);
+				g4.drawString(""+rid, reallocX(x)-20, reallocY(y)-20);
 			} catch (JSONException e) {e.printStackTrace();}
 		}
-		Graphics2D g4 = (Graphics2D) g;
-		
-		g4.setColor(Color.BLACK);
-		float f=50.0f; // font size.
-		g4.setFont(g4.getFont().deriveFont(f));
-		g4.drawString("Score:", 133, 245);
+				
 		g4.setColor(Color.RED);
-		float f1=50.0f; // font size.
+		float f1=35.0f; // font size.
 		g4.setFont(g4.getFont().deriveFont(f1));
-		g4.drawString(""+_score, 156, 300);
+		g4.drawString(""+_score,  (int)(defultx*0.070),  (int)(defulty*0.29));
 
 
 	}
+
 }
 
 

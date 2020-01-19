@@ -8,18 +8,8 @@ After playing the user will also have the option to export the game to KML then 
 
 The server will then provide the game info that contain -
 1. Graph - a directed graph (AKA DGraph) build from vertexes (AKA NodeV) and edges (AKA Edge) each.  
-![image](https://user-images.githubusercontent.com/57361655/72682485-1cded780-3ad6-11ea-9139-962ff244f33a.png)
-
-
 2. Robots - the robots (in this game Gargamle) will have speed path to walk and value that based on how many fruits they collected.
-
-![image](https://user-images.githubusercontent.com/57361655/72682522-6fb88f00-3ad6-11ea-9570-36755018f034.png)
-
-
-
 3. Fruits - the fruits (in this game the smurfs) will have type ( -1 -> papasmurf. 1 -> smurfette) value and location on the graph.
-
-![enter image description here](https://i.pinimg.com/originals/a9/05/d2/a905d2bd9bd51e7a524f287e863eef05.jpg)
 
 
 ## Game concept

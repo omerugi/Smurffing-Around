@@ -142,15 +142,27 @@ public class GamePlayer extends Observable implements Runnable {
 
 		int ind = 30; 		int delay = 0;
 		long first = System.currentTimeMillis();
-		while(  game.timeToEnd()/100!=0 ) {
+		int dt =0;
+		while( game.isRunning()) {
 
-			if((game.timeToEnd()/50)%1==0) {
-				AutomoveRobots();
-				gui.repaint();}
-
-			if(System.currentTimeMillis() - first >= 10000){
-				first = System.currentTimeMillis();
+			
+			AutomoveRobots();
+			gui.repaint();
+			
+			try {
+				Thread.sleep(dt);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			
+//			if((game.timeToEnd()/50)%1==0) {
+//				AutomoveRobots();
+//				gui.repaint();}
+//
+//			if(System.currentTimeMillis() - first >= 10000){
+//				first = System.currentTimeMillis();
+//			}
 		}
 	}
 

@@ -2,6 +2,7 @@ package gameClient;
 
 import elements.*;
 
+import java.awt.Component;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Queue;
 import java.util.StringTokenizer;
+
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.json.JSONException;
@@ -50,7 +53,7 @@ public class GamePlayer extends Observable implements Runnable {
 	game_service game;
 	JFrame frame = null; int Level_chooser = 0; int GameType_chooser = 0;
 	String graph_string;
-
+	int UserId;
 
 	public  void test1() {
 
@@ -145,24 +148,24 @@ public class GamePlayer extends Observable implements Runnable {
 		int dt =0;
 		while( game.isRunning()) {
 
-			
+
 			AutomoveRobots();
 			gui.repaint();
-			
+
 			try {
 				Thread.sleep(dt);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-//			if((game.timeToEnd()/50)%1==0) {
-//				AutomoveRobots();
-//				gui.repaint();}
-//
-//			if(System.currentTimeMillis() - first >= 10000){
-//				first = System.currentTimeMillis();
-//			}
+
+			//			if((game.timeToEnd()/50)%1==0) {
+			//				AutomoveRobots();
+			//				gui.repaint();}
+			//
+			//			if(System.currentTimeMillis() - first >= 10000){
+			//				first = System.currentTimeMillis();
+			//			}
 		}
 	}
 
@@ -306,7 +309,7 @@ public class GamePlayer extends Observable implements Runnable {
 			HashMap<Integer, Queue<Edge>>robot_final = robot_final_dest1;
 			//checks if robot reached his fruit. 
 			for (int i = 0; i < robots_list.size(); i++) {
-				
+
 				if(robots_list.get(i).getDest() ==-1) {  //robot reached an edge destination  
 
 					Edge e = robot_final_dest1.get(i).remove(); 
@@ -315,7 +318,7 @@ public class GamePlayer extends Observable implements Runnable {
 					}
 					double temp = final_dest_len.get(i);		
 					final_dest_len.set(i, temp-e.getWeight());  // if the queue of the local path isn't empty --> update the value of the path minus 
-																// the weight of the previous edge the robot just passed.  
+					// the weight of the previous edge the robot just passed.  
 					int id_dest = e.getDest();					
 					game.chooseNextEdge(robots_list.get(i).getId(), id_dest); // update the next move of the robot to the server. 
 				}
@@ -323,39 +326,39 @@ public class GamePlayer extends Observable implements Runnable {
 		}
 	}
 
-/**
- * This method is in charge of the menual game operations. 
- * 
- * each time a robot is reached his destination a pop frame will appear and the next destination 
- * will be committed by the user.
- */
+	/**
+	 * This method is in charge of the menual game operations. 
+	 * 
+	 * each time a robot is reached his destination a pop frame will appear and the next destination 
+	 * will be committed by the user.
+	 */
 	private  void playMenual() {
 		//open a GUI frame. 
 		GUI gui = new GUI(dgraph,game,Level_chooser);
 		gui.setVisible(true);
-		
+
 		game.startGame(); //start the game.
 
 		while(game.isRunning()) { // while there is more time in the game move the robots.
-			
+
 			if((game.timeToEnd()/10)%2 ==0) {
-			moveRobotsM();
-			gui.repaint();
+				moveRobotsM();
+				gui.repaint();
 			}
 		}
 
 	}
-/**
- * this method is in charge of the UI between the robots and the User. 
- * 
- */
+	/**
+	 * this method is in charge of the UI between the robots and the User. 
+	 * 
+	 */
 	private void moveRobotsM() {
 
 		List<String> log = game.move();
-		
+
 		int d_choosen = -1; 				//destination chosen by user.
 		if(log!=null) {	
-			
+
 			updateRobots(game,dgraph,log);  //update --> robot info. 
 			fruits.update(game, dgraph);	//update --> fruit basket. 
 
@@ -391,9 +394,9 @@ public class GamePlayer extends Observable implements Runnable {
 			//advanced the robot in the path to the destination chosen by user 
 			for (int i = 0; i < robots_list.size(); i++) {
 				if(robots_list.get(i).getDest() ==-1) { //if the robot finished an edge
-					
+
 					node_data e = robot_final_dest.get(i).remove();	//remove the edge from the queue 
-					
+
 					if(robot_final_dest.get(i).size() == 0) { //if the queue is empty set the path to null
 						robot_final_dest.put(i, null);
 					}
@@ -403,16 +406,16 @@ public class GamePlayer extends Observable implements Runnable {
 		}
 	}
 
-/**
- * thread method
-	
- */
+	/**
+	 * thread method
+
+	 */
 	@Override
 	public void run() {
 		test1();
 
 	}
-	
+
 	/**
 	 * Updating the kml file with all the robots kml's data.
 	 */
@@ -422,9 +425,9 @@ public class GamePlayer extends Observable implements Runnable {
 
 	}
 
-/*
- * pop a frame in the end of the game to save the game to a kml file. 
- */
+	/*
+	 * pop a frame in the end of the game to save the game to a kml file. 
+	 */
 	private void kml_save_framePOP() {
 		Object[] possibilities21 = {"YES" , "NO"};
 		String s4 =  (String)JOptionPane.showInputDialog(frame,"would you like to save?","Save Panel", JOptionPane.PLAIN_MESSAGE,null ,possibilities21,  "");
@@ -441,29 +444,39 @@ public class GamePlayer extends Observable implements Runnable {
 		}
 	}
 
-/**
- * this method in charge of the UI choice of the game type :
- *  1.manual or automate.
- *  2.game Level.
- *  update the game <--
- */
+	/**
+	 * this method in charge of the UI choice of the game type :
+	 *  1.manual or automate.
+	 *  2.game Level.
+	 *  update the game <--
+	 */
 	private void GameType_GameLevel() {
-		boolean flag = true;
-		while (flag) {
-			/////////////////////Choose Game Type : Auto or Manual////////////////////////
-			Object[] possibilities1 = {"Automatic" , "Menual"};
-			String s1 =  (String)JOptionPane.showInputDialog(frame,"Play automatic or Menual","Auto or Menual", JOptionPane.PLAIN_MESSAGE,null ,possibilities1,  "");
-			if(s1 == "Automatic") {GameType_chooser  = 0 ; }
-			if(s1 == "Menual")    {GameType_chooser  = 1 ; }
 
-			///////////////////////////////Choose level//////////////////////////////////
-			Object[] possibilities2 = {"0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
-			String s2 = (String)JOptionPane.showInputDialog(frame,"pick game","Choose Game Level:", JOptionPane.PLAIN_MESSAGE,null ,possibilities2,  "");
-			try {Level_chooser =Integer.parseInt(s2);flag = false;
-			}catch (Exception e) {};
-		}
+		JOptionPane pan = new JOptionPane();				    Component frame=null;
 
-		game = Game_Server.getServer(Level_chooser); 			 //peek the level from server. 
+		ImageIcon Back = new ImageIcon("src\\Back.png");		boolean flag = true;
+
+		
+		//opening and connecting to server.
+		UserId   = (int) pan.showInputDialog(frame, "Connecting to Server Please Enter ID", "Welcome", 1, Back, null, null);
+		//if (exist in data?)
+		System.out.println(UserId);
+
+
+		Object[] possibilities1 = {"Automatic" , "Menual"};
+		String s1 =  (String)pan.showInputDialog(frame,"Play automatic or Menual","Auto or Menual", pan.PLAIN_MESSAGE,Back ,possibilities1,  "");
+		if(s1 == "Automatic") {GameType_chooser  = 0 ; }
+		if(s1 == "Menual")    {GameType_chooser  = 1 ; }
+
+//
+//		///////////////////////////////Choose level//////////////////////////////////
+//		Object[] possibilities2 = {"0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
+//		String s2 = (String)JOptionPane.showInputDialog(frame,"pick game","Choose Game Level:", JOptionPane.PLAIN_MESSAGE,null ,possibilities2,  "");
+//		try {Level_chooser =Integer.parseInt(s2);flag = false;
+//		}catch (Exception e) {};
+
+
+		game = Game_Server.getServer(0); 			 //peek the level from server. 
 		String graph_string = game.getGraph();					 //Getting the level map(graph). 
 
 	}

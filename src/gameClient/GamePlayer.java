@@ -24,6 +24,7 @@ import Server.Game_Server;
 import Server.game_service;
 import algorithms.Graph_Algo;
 import dataStructure.DGraph;
+import dataStructure.edge_data;
 import dataStructure.node_data;
 import elements.Edge;
 import elements.Fruit_Basket;
@@ -50,29 +51,35 @@ public class GamePlayer extends Observable implements Runnable {
 	kmlmaker kml;
 	//the graph that will be used in the game
 	DGraph dgraph = new DGraph();
-	game_service game;
-	JFrame frame = null; int Level_chooser = 0; int GameType_chooser = 0;
-	String graph_string;
-	int UserId;
+	game_service game;	JFrame frame = null; 	int Level_chooser = 0; int GameType_chooser = 0;
+	String graph_string;	int UserId;	int gamestart=0; int score; int moves; 
+	int [][] gameLevel ={ //level,score,moves//
+			{0,145,290},			{1,450,580},
+			{3,720,580},			{5,570,500},
+			{9,510,580},			{11,510,580},
+			{13,310,580},			{16,235,290},
+			{19,250,580},			{20,200,290},
+			{23,1000,1140}};
+
+	int gameLevelIndex=0;
 
 	public  void test1() {
 
-		//////////////////////////////////////////////////Game set up/////////////////////////////////////////////////////////////////////////////////////////////////////// 
-		GameType_GameLevel();		
-		graph_string = game.getGraph();					 //Getting the level map(graph). 
 
+		//////////////////////////////////////////////////Game set up/////////////////////////////////////////////////////////////////////////////////////////////////////// 
+		GameType(); 
+				
+		graph_string = game.getGraph();					 //Getting the level map(graph). 
 		dgraph.init(graph_string);									      //initializing the graph		
 		kml = kmlmaker.get_kmlmaker();		kml.add_kml(dgraph.to_kml()); //initialized KML file.
+		
 		initRobots(); 													  //creating the robots. 
 
-
 		////Start Automatic Game/////
-		if		(GameType_chooser == 0)		{	PlayAuto();   }//game is running...
+		if		(GameType_chooser == 0)		{	PlayAuto  (); }//game is running...
 
 		////Start   manual  Game/////
 		else if	(GameType_chooser == 1) 	{	playMenual(); }//game is running...
-
-
 
 		//---------------------------------------------------------------------------------|
 		//will continued after the game is ended										   |
@@ -83,6 +90,10 @@ public class GamePlayer extends Observable implements Runnable {
 
 		//Print the Game results//
 		String results = game.toString();
+		String remark = kml.toString();
+		System.out.println(kml.toString());
+		
+		game.sendKML(remark);
 		System.out.println("Game Over: "+results);
 	}
 
@@ -108,7 +119,6 @@ public class GamePlayer extends Observable implements Runnable {
 			fruits = new Fruit_Basket(game, dgraph);
 			robots_list = new ArrayList<robot>();		 //creating the list of the robots.
 			kml.add_kml(robot.init_Kml());
-
 			Fruit_Basket temp = new Fruit_Basket(game, dgraph);
 
 			while(f_iter.hasNext()) {System.out.println(f_iter.next());}	
@@ -116,9 +126,13 @@ public class GamePlayer extends Observable implements Runnable {
 
 			for(int a = 0;a<rs;a++) {
 				// will get an ID of node and place a robot on it.
-				int src = temp.getMax().getFruitEdge().getSrc();
+				Edge tempoEdge = temp.getMax().getFruitEdge();
+				int src = tempoEdge.getSrc();
 				game.addRobot(src);
 				robot r = new robot(a);
+				Queue<Edge> first_q = new LinkedList<Edge>();
+				first_q.add(tempoEdge);
+				robot_final_dest1.put(a,first_q);
 				robots_list.add(r);
 				final_dest_len.add(Double.MAX_VALUE);
 			}
@@ -127,7 +141,7 @@ public class GamePlayer extends Observable implements Runnable {
 
 	}
 
-
+	long dt =125;
 	/**
 	 * Main Method of the automatic game:
 	 * 
@@ -143,32 +157,30 @@ public class GamePlayer extends Observable implements Runnable {
 
 		game.startGame();			 		// Commend the game server to start the game. 
 
-		int ind = 30; 		int delay = 0;
 		long first = System.currentTimeMillis();
-		int dt =0;
-		while( game.isRunning()) {
-
-
+	
+		long time = game.timeToEnd();
+		long timeSystem1 = System.currentTimeMillis();
+		long timeSystem2 = System.currentTimeMillis()+time;
+		while(  game.timeToEnd()>=0) {
+			timeSystem1 = System.currentTimeMillis();
+			
 			AutomoveRobots();
 			gui.repaint();
 
 			try {
+			//	System.out.println("while dt:   "+dt);
 				Thread.sleep(dt);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-			//			if((game.timeToEnd()/50)%1==0) {
-			//				AutomoveRobots();
-			//				gui.repaint();}
-			//
-			//			if(System.currentTimeMillis() - first >= 10000){
-			//				first = System.currentTimeMillis();
-			//			}
-		}
-	}
 
+		}
+		
+	}
+	
 	long update_time =System.currentTimeMillis();
 	/**
 	 * in charge of setting all the information of the robots in the game. 
@@ -177,20 +189,9 @@ public class GamePlayer extends Observable implements Runnable {
 	 */
 	private void updateRobots(game_service game, DGraph dgraph,  List<String> log) {
 
-		//List<String> log = game.move();		 // getting the game log information. 
-
-		String info = game.toString();		// getting the game information from the server. 
-		JSONObject sline;
-
-		//extract the number of the robots in the game. 
-		int numberOfRobots = 0;
-		try {sline = new JSONObject(info);
-		JSONObject tttt = sline.getJSONObject("GameServer");
-		numberOfRobots = tttt.getInt("robots"); //tell me how many robots there are in the game. 
-		} catch (JSONException e1) {}
-
+		
 		//extract the robots meta data from the server.
-		for(int i=0;i<numberOfRobots;i++) {
+		for(int i=0;i<robots_list.size();i++) {
 			String robot_json = log.get(i); // get the i'th robot string. 
 
 			try {
@@ -241,12 +242,17 @@ public class GamePlayer extends Observable implements Runnable {
 	 *   in the end each robot will hold a single fruit path. 
 	 *   in the end the local hash will be updated to the new path chosen to the robot.
 	 */
+	
+	private boolean did_eat = false;
 	private void AutomoveRobots() {
 
 		List<String> log = game.move(); //check connection to server. 
 
 		if(log!=null) {
+			
+		
 			fruits.update(game, dgraph); 	//--> update fruit basket.
+			
 			updateRobots(game,dgraph,log);	//--> update robots
 
 
@@ -315,7 +321,27 @@ public class GamePlayer extends Observable implements Runnable {
 					Edge e = robot_final_dest1.get(i).remove(); 
 					if(robot_final_dest1.get(i).size() == 0) {  // if the queue of the local path of the robot is empty. 
 						robot_final_dest1.put(i, null);			// update the path to null.
+						System.out.println("enter!!!!!!!!!!!!!!! ");
+						System.out.println(robot_final_dest1.toString());
+						System.out.println(robots_list.get(i).getrobot_Heap().toString());
+//						//robot x,y
+//						double rx 	= robots_list.get(i).getLocation().x(); 	double ry = robots_list.get(i).getLocation().y();
+//						//fruit x,y 
+//						double fx 	= robots_list.get(i).getFruit().getLocation().x();		double fy = robots_list.get(i).getFruit().getLocation().y(); 
+//						
+//						//edge src coord
+//						double srcx =e.getSrcNode().getLocation().x();			double srcy =e.getSrcNode().getLocation().y();
+//						//edge dest coord
+//						double destx =e.getDestNode().getLocation().x();		double desty=e.getDestNode().getLocation().y();
+//						
+//						double t =(Graph_Algo.CalcLen(rx, fx, ry, fy)/Graph_Algo.CalcLen(srcx,destx, srcy, desty));
+//						t = t*e.getWeight();
+//						dt = (long) (t/(robots_list.get(i).getSpeed()-0.6)*100);
+//						
+						did_eat = true;
+						
 					}
+					
 					double temp = final_dest_len.get(i);		
 					final_dest_len.set(i, temp-e.getWeight());  // if the queue of the local path isn't empty --> update the value of the path minus 
 					// the weight of the previous edge the robot just passed.  
@@ -450,33 +476,42 @@ public class GamePlayer extends Observable implements Runnable {
 	 *  2.game Level.
 	 *  update the game <--
 	 */
-	private void GameType_GameLevel() {
+	private void GameType() {
 
 		JOptionPane pan = new JOptionPane();				    Component frame=null;
 
-		ImageIcon Back = new ImageIcon("src\\Back.png");		boolean flag = true;
+		ImageIcon Back = new ImageIcon("data\\Back.png");		boolean flag = true;
 
+		while(flag) {
+			//opening and connecting to server.
+			String idTemp   = (String) JOptionPane.showInputDialog(frame, "Connecting to Server Please Enter ID", "Welcome", 1, Back, null, null);
+			//if (exist in data?)
+			System.out.println(idTemp);
+			try {UserId =Integer.parseInt(idTemp);flag = false;
+			}catch (Exception e) {};
+		}flag =true;
 		
-		//opening and connecting to server.
-		UserId   = (int) pan.showInputDialog(frame, "Connecting to Server Please Enter ID", "Welcome", 1, Back, null, null);
-		//if (exist in data?)
-		System.out.println(UserId);
-
+		Game_Server.login(UserId);
 
 		Object[] possibilities1 = {"Automatic" , "Menual"};
 		String s1 =  (String)pan.showInputDialog(frame,"Play automatic or Menual","Auto or Menual", pan.PLAIN_MESSAGE,Back ,possibilities1,  "");
 		if(s1 == "Automatic") {GameType_chooser  = 0 ; }
 		if(s1 == "Menual")    {GameType_chooser  = 1 ; }
 
-//
-//		///////////////////////////////Choose level//////////////////////////////////
-//		Object[] possibilities2 = {"0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
-//		String s2 = (String)JOptionPane.showInputDialog(frame,"pick game","Choose Game Level:", JOptionPane.PLAIN_MESSAGE,null ,possibilities2,  "");
-//		try {Level_chooser =Integer.parseInt(s2);flag = false;
-//		}catch (Exception e) {};
+		///////////////////////////////Choose level//////////////////////////////////
+		while(flag) {
+		Object[] possibilities2 = {"-1","0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
+		String s2 = (String)pan.showInputDialog(frame,"pick game","Choose Game Level:", pan.PLAIN_MESSAGE,Back ,possibilities2,  "");
+		try {	
+			Level_chooser =Integer.parseInt(s2);
+			game = Game_Server.getServer(Level_chooser);
+			flag = false;
+		}catch (Exception e) {
+			JOptionPane.showConfirmDialog(frame,e);
+		}
+		}
 
-
-		game = Game_Server.getServer(0); 			 //peek the level from server. 
+		 		 //peek the level from server. 
 		String graph_string = game.getGraph();					 //Getting the level map(graph). 
 
 	}

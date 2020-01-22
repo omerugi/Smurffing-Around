@@ -348,24 +348,31 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 		ImageIcon Score = new ImageIcon("data\\Score.png");
 		Image  Score1  = Score.getImage();
-		g.drawImage(Score1, (int)(defultx*0.0313), (int)(defulty*0.075),(int)(defulty*0.273),(int)(defulty*0.273), this);
+		
+		g.drawImage(Score1, (int)(defultx*0.0313), (int)(defulty*0.075),
+					(int)(defulty*0.273),(int)(defulty*0.273), this);
 
 		
 		ImageIcon sd = new ImageIcon("data\\GameBoard.png");
 		Image  sd1  = sd.getImage();
-		g.drawImage(sd1, (int)(defultx*0.85),(int)(defulty*0.76),(int)(defulty*0.233),(int)(defulty*0.233), this);
+		g.drawImage(sd1, (int)(defultx*0.85),(int)(defulty*0.76),
+						(int)(defulty*0.233),(int)(defulty*0.233), this);
+		
 		
 		Graphics2D G = (Graphics2D)g;
 		float f=26.0f; // font size.
 		G.setFont(G.getFont().deriveFont(f));
-		G.drawString("Time-Left    "+game.timeToEnd()/1000,(int)(defultx*0.857),(int)(defulty*0.842));
+		G.drawString("Time-Left    "+ game.timeToEnd()/1000 , (int)(defultx*0.857),(int)(defulty*0.842));
 		
-		G.drawString("Level:       "+this.Level,(int)(defultx*0.857),(int)(defulty*0.865));
+		G.drawString("Level:       "+ this.Level			, (int)(defultx*0.857),(int)(defulty*0.865));
 		
 		g4.setColor(Color.BLACK);
 		f=35.0f; // font size.
 		g4.setFont(g4.getFont().deriveFont(f));
 		g4.drawString("Score:", (int)(defultx*0.070), (int)(defulty*0.24));
+		
+		
+		
 		
 	}
 

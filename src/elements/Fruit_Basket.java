@@ -94,6 +94,7 @@ public class Fruit_Basket {
 		
 		Fruit_Basket temp = new Fruit_Basket(game,gg);
 		ArrayList <Fruit> temp_fruits = temp.gerFruitList();
+	
 			
 		for (int i = 0; i  < temp_fruits.size(); i++) {
 			

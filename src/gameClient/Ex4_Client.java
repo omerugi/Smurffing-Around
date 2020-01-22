@@ -41,8 +41,8 @@ public class Ex4_Client implements Runnable{
 	
 	@Override
 	public void run() {
-		int scenario_num = -1; // current "stage is 9, can play[0,9], can NOT 10 or above
-		int id = 999;
+		int scenario_num = 11; // current "stage is 9, can play[0,9], can NOT 10 or above
+		int id = 203024989;
 		Game_Server.login(id);
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		

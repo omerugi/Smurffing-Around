@@ -339,7 +339,7 @@ public class DGraph extends Observable  implements graph, Serializable {
 		edges_kml.append(add_headline_edges());
 
 		StringBuffer graph_kml = new StringBuffer();
-		graph_kml.append("<Folder>\r\n+"
+		graph_kml.append("<Folder>\r\n"
 				+ "      <name>Graph</name>");
 
 		while(hit.hasNext()) {

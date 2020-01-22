@@ -130,7 +130,7 @@ public class NodeV implements node_data, Serializable {
 				"		<name>Vertex:" +this.getKey() +"</name>\r\n" +  
 				"		<description> Graph's vertex	</description>\n"+			
 				"		<Point>\r\n" +  
-				"			<coordinates>"+this.getLocation().x() +","+this.getLocation().y()+",1</coordinates>\r\n" + 
+				"			<coordinates>"+this.getLocation().x() +","+this.getLocation().y()+",0</coordinates>\r\n" + 
 				"		</Point>\r\n" + 
 				"	</Placemark>\n";
 

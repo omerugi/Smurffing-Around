@@ -13,7 +13,7 @@ import utils.*;
  */
 public class Fruit {
 
-	edge_data 	fruitEdge; 		//where the fruit at 
+	Edge 	fruitEdge; 		//where the fruit at 
 	double 		value; 			//value of the fruit
 	double 		type; 			//fruit type (-1/1)
 	Point3D 	location;		//fruit 3D coordinates
@@ -33,7 +33,7 @@ public class Fruit {
  * @param p		- fruit coordinates
  * @param e		- fruit edge. (edge which the fruit on)
  */
-	public Fruit(double type, double v, Point3D p, edge_data e) {
+	public Fruit(double type, double v, Point3D p, Edge e) {
 		this.type = type;
 		this.value = v;
 		this.location = new Point3D(p);
@@ -52,7 +52,7 @@ public class Fruit {
 /**
  * @return the edge which the fruit is on it. 
  */
-	public edge_data getFruitEdge() {
+	public Edge getFruitEdge() {
 		return fruitEdge;
 	}
 /**

@@ -26,8 +26,8 @@ import utils.Point3D;
  */
 public class Fruit_Basket {
 
-	ArrayList <Fruit> fruits = new ArrayList<Fruit>(); // Array list of fruits ( the container )  
-	StringBuffer fruitBuffer = new StringBuffer();    // String buffer - will contain the fruits in a KML String. 
+	private ArrayList <Fruit> fruits = new ArrayList<Fruit>(); // Array list of fruits ( the container )  
+	private StringBuffer fruitBuffer = new StringBuffer();    // String buffer - will contain the fruits in a KML String. 
 	
 	//
 	public Fruit_Basket () {
@@ -133,7 +133,7 @@ public class Fruit_Basket {
 		for (int i = 0; i < this.fruits.size(); i++) {
 			if(fruits.get(i).getLocation().x()==fruit_pos.x() 
 					&& fruits.get(i).getLocation().y() ==fruit_pos.y()  
-					&& fruits.get(i).type==type && fruits.get(i).value==value) 
+					&& fruits.get(i).getType()==type && fruits.get(i).getValue()==value) 
 			{return true;}
 		}
 		return false;

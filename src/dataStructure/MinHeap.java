@@ -29,9 +29,9 @@ public class MinHeap{
 	 * Fruit 			  - The fruit which the path is set to. 
 	 */
 	public class node{
-		double getPathDist;
-		Object [] path;	
-		Fruit fruit;
+		private double getPathDist;
+		private Object [] path;	
+		private Fruit fruit;
 		/**
 		 * Constructor
 		 */
@@ -64,7 +64,7 @@ public class MinHeap{
 
 
 	//will holds the path. 
-	ArrayList<node> heap;
+	private ArrayList<node> heap;
 
 	public MinHeap () {
 		heap = new ArrayList<node>();

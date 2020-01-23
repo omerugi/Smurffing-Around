@@ -22,17 +22,17 @@ import utils.Point3D;
  */
 public class robot {
 
-	Queue<Edge> path = null;
-	int 	id;    						//Id of the robot.
-	Point3D location;					//Robot x,y coordinates.
-	double 	Speed; 						//Robot speed. 
-	int 	src; 						//the robot current vertex .
-	int 	dest;						//the next vertex of the robot (-1 means robot is wait to instructions).
-	MinHeap robot_Heap;					//will contain a list of the shortest paths from the robot to a fruit.
-	double path_len;					//the length of the path to the fruit. 
-	Fruit fruit;						//the fruit the robot goes to.
-	StringBuffer robotBuffer;			//String of the robot objects. 
-	int folder=0;						//will indicates if the 'folder' section already written to the KML.
+	private Queue<Edge> path = null;
+	private int 	id;    						//Id of the robot.
+	private Point3D location;					//Robot x,y coordinates.
+	private double 	Speed; 						//Robot speed. 
+	private int 	src; 						//the robot current vertex .
+	private int 	dest;						//the next vertex of the robot (-1 means robot is wait to instructions).
+	private MinHeap robot_Heap;					//will contain a list of the shortest paths from the robot to a fruit.
+	private double path_len;					//the length of the path to the fruit. 
+	private Fruit fruit;						//the fruit the robot goes to.
+	private StringBuffer robotBuffer;			//String of the robot objects. 
+	private int folder=0;						//will indicates if the 'folder' section already written to the KML.
 	private static int style_init =0;	//will indicates if the 'style' section already written to the KML
 	
 	//defult constructor. 

@@ -37,40 +37,33 @@ public class GamePlayer extends Observable implements Runnable {
 	////////////////////////////////////Class fields/////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////
 	//fruit Basket object
-	Fruit_Basket fruits;
+	private Fruit_Basket fruits;
 	//Array list of the robots
-	ArrayList<robot> robots_list;
+	private ArrayList<robot> robots_list;
 	//Auto Game  - data structure of robots and paths in a hash, used for the robots paths.
-	HashMap<Integer, Queue<Edge>> robot_final_dest1 = new HashMap<Integer, Queue<Edge>>();
+	private HashMap<Integer, Queue<Edge>> robot_final_dest1 = new HashMap<Integer, Queue<Edge>>();
 	//Menual Game -  data structure of robots and paths in a hash, used for the robots paths.
-	HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
-	ArrayList<Double> final_dest_len = new ArrayList<Double>();
+	private HashMap<Integer, Queue<node_data>> robot_final_dest = new HashMap<Integer, Queue<node_data>>();
+	private ArrayList<Double> final_dest_len = new ArrayList<Double>();
 	//used for the user choices. 
-	boolean flag = true;
+	private boolean flag = true;
 	//KML file.
-	kmlmaker kml;
+	private kmlmaker kml;
 	//the graph that will be used in the game
-	DGraph dgraph = new DGraph();
-	game_service game;	JFrame frame = null; 	int Level_chooser = 0; int GameType_chooser = 0;
-	String graph_string;	int UserId;	int gamestart=0; int score; int moves; 
-	int [][] gameLevel ={ //level,score,moves//
-			{0,145,290},			{1,450,580},
-			{3,720,580},			{5,570,500},
-			{9,510,580},			{11,510,580},
-			{13,310,580},			{16,235,290},
-			{19,250,580},			{20,200,290},
-			{23,1000,1140}};
-
-	int gameLevelIndex=0;
-
-	public  void test1() {
+	private DGraph dgraph = new DGraph();
+	private static game_service game;	JFrame frame = null; 	static int Level_chooser = 0; int GameType_chooser = 0;
+	private static String graph_string;	int UserId;	int gamestart=0; int score; int moves; 
+	private int gameLevelIndex=0;
+	private static GameServer server = new GameServer();
+	private void test1() {
 
 
 		//////////////////////////////////////////////////Game set up/////////////////////////////////////////////////////////////////////////////////////////////////////// 
 		GameType(); 
-				
+		
 		graph_string = game.getGraph();					 //Getting the level map(graph). 
 		dgraph.init(graph_string);									      //initializing the graph		
+		GameInit(); //rotem<<
 		kml = kmlmaker.get_kmlmaker();		kml.add_kml(dgraph.to_kml()); //initialized KML file.
 		
 		initRobots(); 													  //creating the robots. 
@@ -140,8 +133,7 @@ public class GamePlayer extends Observable implements Runnable {
 		}catch (JSONException e) {e.printStackTrace();}	
 
 	}
-
-	long dt =125;
+	static long dt =120;
 	/**
 	 * Main Method of the automatic game:
 	 * 
@@ -151,6 +143,23 @@ public class GamePlayer extends Observable implements Runnable {
 	 */
 	private  void PlayAuto() {
 
+		if(Level_chooser==3) {
+			 dt =112;
+		}
+		
+		if(Level_chooser==5) {
+			 dt =116;
+		}
+		if(Level_chooser==9) {
+			 dt =117;
+		}
+		if(Level_chooser==23) {
+			 dt =100;
+		}
+		if(Level_chooser==20) {
+			 dt =108;
+		}
+		System.out.println(dt);
 		//Open the Game window display (GUI)
 		GUI gui = new GUI(dgraph,game,Level_chooser);	//open the GUI frame. 
 		gui.setVisible(true);		
@@ -166,9 +175,35 @@ public class GamePlayer extends Observable implements Runnable {
 			timeSystem1 = System.currentTimeMillis();
 			
 			AutomoveRobots();
+	
 			gui.repaint();
 
 			try {
+				
+				
+				if(game.timeToEnd()/1000<18.0 && Level_chooser==3) {
+					dt=100;
+					System.out.println(dt);
+				}
+			
+				if(game.timeToEnd()/1000<20 && Level_chooser==9) {
+					dt=99;
+					System.out.println(dt);
+				}
+				if(game.timeToEnd()/1000<40 && Level_chooser==23) {
+					dt=90;
+					System.out.println(dt);
+				}
+				
+				if(game.timeToEnd()/1000<17 && Level_chooser==23) {
+					dt=50;
+					System.out.println(dt);
+				}
+				if(game.timeToEnd()/1000<5.9 && Level_chooser==20) {
+					dt=97;
+					System.out.println(dt);
+				}
+				
 			//	System.out.println("while dt:   "+dt);
 				Thread.sleep(dt);
 			} catch (InterruptedException e) {
@@ -515,4 +550,31 @@ public class GamePlayer extends Observable implements Runnable {
 		String graph_string = game.getGraph();					 //Getting the level map(graph). 
 
 	}
+	
+	
+	
+	
+	public static void GameInit()
+	{
+
+
+		String info = game.toString();
+		JSONObject line;
+
+		try
+		{
+			line = new JSONObject(info);
+			JSONObject ttt = line.getJSONObject("GameServer");
+			int rs = ttt.getInt("robots");
+			int moves = ttt.getInt("moves");
+			int grade = ttt.getInt("grade");
+			server = new GameServer(game.getFruits(),moves,grade,rs,graph_string,game,Level_chooser);
+		}
+		catch (JSONException e) {e.printStackTrace();}
+	}
+
+	
+	
+	
+	
 }

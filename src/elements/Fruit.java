@@ -13,12 +13,12 @@ import utils.*;
  */
 public class Fruit {
 
-	Edge 	fruitEdge; 		//where the fruit at 
-	double 		value; 			//value of the fruit
-	double 		type; 			//fruit type (-1/1)
-	Point3D 	location;		//fruit 3D coordinates
-	String 		StartTime;		//time stamp of the fruit creations.
-	double 		id;				//fruit id (fruit id is the sum of the multiplication of 
+	private Edge 	fruitEdge; 		//where the fruit at 
+	private double 		value; 			//value of the fruit
+	private double 		type; 			//fruit type (-1/1)
+	private Point3D 	location;		//fruit 3D coordinates
+	private String 		StartTime;		//time stamp of the fruit creations.
+	private double 		id;				//fruit id (fruit id is the sum of the multiplication of 
 								//the x*y*type (x,y 3D coordinates of the fruit). 
 	static int style_init =0;	//will indicates if the 'style' section already written to the KML
 	

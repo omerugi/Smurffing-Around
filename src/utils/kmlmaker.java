@@ -50,7 +50,7 @@ import dataStructure.node_data;
  */
 public class kmlmaker {
 
-	StringBuffer game_kml;					//will hold the kml buffer.
+	private StringBuffer game_kml;					//will hold the kml buffer.
 	private static int singletone = 0;		//Singleton indicator.	
 	private static int info = 0;  			//Indicator for entering a default start
 	private static kmlmaker kml;			//Kml file.
@@ -166,18 +166,21 @@ public class kmlmaker {
 	/** 
 	 * this method return a string in a kml code format. 
 	 */
+	@Override
 	public String toString() {
 		
 		if(!is_close) {add_end();}
 		is_close = true;
 		
-		return game_kml.toString();
 		
+		return game_kml.toString();
 	}
 	/**
 	 * empty the String Buffer. 
 	 */
 	public void clean() {
+		is_close = false;
+		info = 0;
 		game_kml = new StringBuffer();
 	}
 	

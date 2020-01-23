@@ -44,18 +44,9 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	////////////////////////////////////////////////////////////////
 
 
-	private static final Graphics Graphics = null;
 	private static DecimalFormat df2 = new DecimalFormat("#.##");
-	static JTextField textfield1, textfield2, textfield3;
-	static JButton submit1,submit2;
-	private static JFrame frame;
-	boolean isConnected=false;
-	double pathweight =-1;
-	List<node_data> path;
-	int [][] robotsDialog;
-	Graphics doubleD; 
-	int Level;
-	Graphics2D g4;
+	private int Level;
+	private Graphics2D g4;
 	/////////////////////////////////////////////////////////////////
 	/////////////////////GUI_window_fields//////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -68,8 +59,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 	private int defultx = 1800;	private int defulty = 900;
 
-	//control action for paint//
-	int action=0;
 
 	public Collection<node_data> vertex;
 
@@ -192,12 +181,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		g4 = (Graphics2D)g; 	g4.drawImage(buff,0,0,null);
 
 		paintsmurfs();		paintGargamels();
-
-		if(game.timeToEnd()/10<1) {	
-			ImageIcon GameOver = new ImageIcon("GameOver.png");
-			Image  GameOver1  = GameOver.getImage();
-			g.drawImage(GameOver1, 0, 0,defultx-17, defulty-40, this);
-		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

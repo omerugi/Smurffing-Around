@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+  <Document>
+    <name>KML path</name>
+    <open>1</open>
+    <description>
+no info avilable
+    </description> 
+ <LookAt>
+      <longitude>35.20734722222223</longitude>
+      <latitude>32.10453611111111</latitude>
+      <altitude>0</altitude>
+      <range>1131.110892010045</range>
+      <tilt>0</tilt>
+      <heading>-0.3840786059394472</heading>
+    </LookAt>
+<Folder>
+      <name>Graph</name> <Placemark>
+		<name>Vertex:32</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>0.0,1.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:33</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>2.0,2.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:34</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>4.0,4.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:35</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>6.0,8.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:36</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>8.0,16.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:37</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>10.0,32.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:38</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>12.0,64.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:39</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>14.0,128.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:40</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>16.0,256.0,0</coordinates>
+		</Point>
+	</Placemark>
+ <Placemark>
+		<name>Vertex:41</name>
+		<description> Graph's vertex	</description>
+		<Point>
+			<coordinates>18.0,512.0,0</coordinates>
+		</Point>
+	</Placemark>
+<Placemark>
+		<name>Graph</name>
+		<styleUrl>#m_ylw-pushpin</styleUrl>
+		<LineString>
+			<tessellate>1</tessellate>
+			<coordinates>
+0.0,1.0,0 4.0,4.0,0 0.0,1.0,0 8.0,16.0,0 0.0,1.0,0 12.0,64.0,0 0.0,1.0,0 16.0,256.0,0 2.0,2.0,0 0.0,1.0,0 2.0,2.0,0 4.0,4.0,0 2.0,2.0,0 8.0,16.0,0 2.0,2.0,0 12.0,64.0,0 2.0,2.0,0 16.0,256.0,0 4.0,4.0,0 0.0,1.0,0 4.0,4.0,0 8.0,16.0,0 4.0,4.0,0 12.0,64.0,0 4.0,4.0,0 16.0,256.0,0 6.0,8.0,0 0.0,1.0,0 6.0,8.0,0 4.0,4.0,0 6.0,8.0,0 8.0,16.0,0 6.0,8.0,0 12.0,64.0,0 6.0,8.0,0 16.0,256.0,0 8.0,16.0,0 0.0,1.0,0 8.0,16.0,0 4.0,4.0,0 8.0,16.0,0 12.0,64.0,0 8.0,16.0,0 16.0,256.0,0 10.0,32.0,0 0.0,1.0,0 10.0,32.0,0 4.0,4.0,0 10.0,32.0,0 8.0,16.0,0 10.0,32.0,0 12.0,64.0,0 10.0,32.0,0 16.0,256.0,0 12.0,64.0,0 0.0,1.0,0 12.0,64.0,0 4.0,4.0,0 12.0,64.0,0 8.0,16.0,0 12.0,64.0,0 16.0,256.0,0 14.0,128.0,0 0.0,1.0,0 14.0,128.0,0 4.0,4.0,0 14.0,128.0,0 8.0,16.0,0 14.0,128.0,0 12.0,64.0,0 14.0,128.0,0 16.0,256.0,0 16.0,256.0,0 0.0,1.0,0 16.0,256.0,0 4.0,4.0,0 16.0,256.0,0 8.0,16.0,0 16.0,256.0,0 12.0,64.0,0 18.0,512.0,0 0.0,1.0,0 18.0,512.0,0 4.0,4.0,0 18.0,512.0,0 8.0,16.0,0 18.0,512.0,0 12.0,64.0,0 18.0,512.0,0 16.0,256.0,0 </coordinates>
+		</LineString>
+	</Placemark></Folder>
+
+	</Document>
+</kml>

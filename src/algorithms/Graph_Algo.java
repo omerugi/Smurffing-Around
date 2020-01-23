@@ -568,7 +568,7 @@ public class Graph_Algo  {
 	 * @return array without duplications. 
 	 */
 
-	static public ArrayList<Integer> removeDuplicates(List<Integer> list) 
+	static private ArrayList<Integer> removeDuplicates(List<Integer> list) 
 	{ 
 
 		// Create a new ArrayList 

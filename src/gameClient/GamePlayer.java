@@ -160,7 +160,7 @@ public class GamePlayer extends Observable implements Runnable {
 		}
 
 		if(Level_chooser==-31) {
-			 dt =50;
+			 dt =20;
 		}
 		
 		//Open the Game window display (GUI)
@@ -253,7 +253,7 @@ public class GamePlayer extends Observable implements Runnable {
 				robots_list.get(i).setLocation(new Point3D(x, y));
 
 				//--> updating KML file
-				if(System.currentTimeMillis() - update_time >= 10){
+				if(System.currentTimeMillis() - update_time >= 0){
 					
 					robots_list.get(i).add_kml_loc();
 				}

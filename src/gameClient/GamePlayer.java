@@ -158,6 +158,11 @@ public class GamePlayer extends Observable implements Runnable {
 		if(Level_chooser==20) {
 			 dt =108;
 		}
+
+		if(Level_chooser==-31) {
+			 dt =50;
+		}
+		
 		//Open the Game window display (GUI)
 		GUI gui = new GUI(dgraph,game,Level_chooser,UserId);	//open the GUI frame. 
 		gui.setVisible(true);		
@@ -248,7 +253,7 @@ public class GamePlayer extends Observable implements Runnable {
 				robots_list.get(i).setLocation(new Point3D(x, y));
 
 				//--> updating KML file
-				if(System.currentTimeMillis() - update_time >= 40){
+				if(System.currentTimeMillis() - update_time >= 10){
 					
 					robots_list.get(i).add_kml_loc();
 				}
@@ -512,7 +517,7 @@ public class GamePlayer extends Observable implements Runnable {
 
 		///////////////////////////////Choose level//////////////////////////////////
 		while(flag) {
-		Object[] possibilities2 = {"-1","0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
+		Object[] possibilities2 = {"-31","-1","0","1", "2", "3","4","5", "6", "7","8","9", "10", "11","12","13", "14", "15","16","17", "18", "19","20","21", "22", "23"};
 		String s2 = (String)pan.showInputDialog(frame,"pick game","Choose Game Level:", pan.PLAIN_MESSAGE,Back ,possibilities2,  "");
 		try {	
 			Level_chooser =Integer.parseInt(s2);

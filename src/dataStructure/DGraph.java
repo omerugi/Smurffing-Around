@@ -340,7 +340,7 @@ public class DGraph extends Observable  implements graph, Serializable {
 
 		StringBuffer graph_kml = new StringBuffer();
 		graph_kml.append("<Folder>\r\n"
-				+ "      <name>Graph</name>");
+				+ "      <name>\r\n Graph \r\n \t</name>\r\n");
 
 		while(hit.hasNext()) {
 			node_data v = (node_data) hit.next();
@@ -378,10 +378,10 @@ public class DGraph extends Observable  implements graph, Serializable {
 	private String add_headline_edges() {
 
 		String temp = "<Placemark>\r\n" + 
-				"		<name>Graph</name>\r\n" + 
+				"		<name>\r\n Graph \r\n</name>\r\n" + 
 				"		<styleUrl>#m_ylw-pushpin</styleUrl>\r\n" + 
 				"		<LineString>\r\n" + 
-				"			<tessellate>1</tessellate>\r\n" + 
+				"			<tessellate>\r\n 1 \r\n</tessellate>\r\n" + 
 				"			<coordinates>\n";
 		return temp;
 

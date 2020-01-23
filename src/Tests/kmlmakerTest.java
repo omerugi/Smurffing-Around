@@ -1,10 +1,11 @@
-package utils;
+package Tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
 import dataStructure.DGraph;
+import utils.kmlmaker;
 
 class kmlmakerTest {
 	

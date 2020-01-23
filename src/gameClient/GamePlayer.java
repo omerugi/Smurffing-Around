@@ -54,7 +54,7 @@ public class GamePlayer extends Observable implements Runnable {
 	private static game_service game;	JFrame frame = null; 	static int Level_chooser = 0; int GameType_chooser = 0;
 	private static String graph_string;	int UserId;	int gamestart=0; int score; int moves; 
 	private int gameLevelIndex=0;
-	private static GameServer server = new GameServer();
+	
 	private void test1() {
 
 
@@ -63,7 +63,7 @@ public class GamePlayer extends Observable implements Runnable {
 		
 		graph_string = game.getGraph();					 //Getting the level map(graph). 
 		dgraph.init(graph_string);									      //initializing the graph		
-		GameInit(); //rotem<<
+	
 		kml = kmlmaker.get_kmlmaker();		kml.add_kml(dgraph.to_kml()); //initialized KML file.
 		
 		initRobots(); 													  //creating the robots. 
@@ -82,9 +82,9 @@ public class GamePlayer extends Observable implements Runnable {
 		kml_save_framePOP();
 
 		//Print the Game results//
-		String results = game.toString();
 		String remark = kml.toString();
-		System.out.println(kml.toString());
+		String results = game.toString();
+		
 		
 		game.sendKML(remark);
 		System.out.println("Game Over: "+results);
@@ -114,7 +114,6 @@ public class GamePlayer extends Observable implements Runnable {
 			kml.add_kml(robot.init_Kml());
 			Fruit_Basket temp = new Fruit_Basket(game, dgraph);
 
-			while(f_iter.hasNext()) {System.out.println(f_iter.next());}	
 			int src_node = 0;  // arbitrary node, you should start at one of the fruits
 
 			for(int a = 0;a<rs;a++) {
@@ -133,7 +132,7 @@ public class GamePlayer extends Observable implements Runnable {
 		}catch (JSONException e) {e.printStackTrace();}	
 
 	}
-	static long dt =120;
+	static long dt =150;
 	/**
 	 * Main Method of the automatic game:
 	 * 
@@ -159,9 +158,8 @@ public class GamePlayer extends Observable implements Runnable {
 		if(Level_chooser==20) {
 			 dt =108;
 		}
-		System.out.println(dt);
 		//Open the Game window display (GUI)
-		GUI gui = new GUI(dgraph,game,Level_chooser);	//open the GUI frame. 
+		GUI gui = new GUI(dgraph,game,Level_chooser,UserId);	//open the GUI frame. 
 		gui.setVisible(true);		
 
 		game.startGame();			 		// Commend the game server to start the game. 
@@ -183,28 +181,25 @@ public class GamePlayer extends Observable implements Runnable {
 				
 				if(game.timeToEnd()/1000<18.0 && Level_chooser==3) {
 					dt=100;
-					System.out.println(dt);
+				
 				}
 			
 				if(game.timeToEnd()/1000<20 && Level_chooser==9) {
 					dt=99;
-					System.out.println(dt);
+				
 				}
 				if(game.timeToEnd()/1000<40 && Level_chooser==23) {
 					dt=90;
-					System.out.println(dt);
+					
 				}
 				
 				if(game.timeToEnd()/1000<17 && Level_chooser==23) {
 					dt=50;
-					System.out.println(dt);
 				}
 				if(game.timeToEnd()/1000<5.9 && Level_chooser==20) {
 					dt=97;
-					System.out.println(dt);
 				}
 				
-			//	System.out.println("while dt:   "+dt);
 				Thread.sleep(dt);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -253,12 +248,12 @@ public class GamePlayer extends Observable implements Runnable {
 				robots_list.get(i).setLocation(new Point3D(x, y));
 
 				//--> updating KML file
-				if(System.currentTimeMillis() - update_time >= 90){
-					update_time = System.currentTimeMillis();
+				if(System.currentTimeMillis() - update_time >= 40){
+					
 					robots_list.get(i).add_kml_loc();
 				}
 			}catch (Exception e) {}
-		}
+		}update_time = System.currentTimeMillis();
 	}
 	/**
 	 * This Method is in charge of the algorithm in which
@@ -356,23 +351,6 @@ public class GamePlayer extends Observable implements Runnable {
 					Edge e = robot_final_dest1.get(i).remove(); 
 					if(robot_final_dest1.get(i).size() == 0) {  // if the queue of the local path of the robot is empty. 
 						robot_final_dest1.put(i, null);			// update the path to null.
-						System.out.println("enter!!!!!!!!!!!!!!! ");
-						System.out.println(robot_final_dest1.toString());
-						System.out.println(robots_list.get(i).getrobot_Heap().toString());
-//						//robot x,y
-//						double rx 	= robots_list.get(i).getLocation().x(); 	double ry = robots_list.get(i).getLocation().y();
-//						//fruit x,y 
-//						double fx 	= robots_list.get(i).getFruit().getLocation().x();		double fy = robots_list.get(i).getFruit().getLocation().y(); 
-//						
-//						//edge src coord
-//						double srcx =e.getSrcNode().getLocation().x();			double srcy =e.getSrcNode().getLocation().y();
-//						//edge dest coord
-//						double destx =e.getDestNode().getLocation().x();		double desty=e.getDestNode().getLocation().y();
-//						
-//						double t =(Graph_Algo.CalcLen(rx, fx, ry, fy)/Graph_Algo.CalcLen(srcx,destx, srcy, desty));
-//						t = t*e.getWeight();
-//						dt = (long) (t/(robots_list.get(i).getSpeed()-0.6)*100);
-//						
 						did_eat = true;
 						
 					}
@@ -395,7 +373,7 @@ public class GamePlayer extends Observable implements Runnable {
 	 */
 	private  void playMenual() {
 		//open a GUI frame. 
-		GUI gui = new GUI(dgraph,game,Level_chooser);
+		GUI gui = new GUI(dgraph,game,Level_chooser,UserId);
 		gui.setVisible(true);
 
 		game.startGame(); //start the game.
@@ -521,7 +499,6 @@ public class GamePlayer extends Observable implements Runnable {
 			//opening and connecting to server.
 			String idTemp   = (String) JOptionPane.showInputDialog(frame, "Connecting to Server Please Enter ID", "Welcome", 1, Back, null, null);
 			//if (exist in data?)
-			System.out.println(idTemp);
 			try {UserId =Integer.parseInt(idTemp);flag = false;
 			}catch (Exception e) {};
 		}flag =true;
@@ -554,24 +531,7 @@ public class GamePlayer extends Observable implements Runnable {
 	
 	
 	
-	public static void GameInit()
-	{
-
-
-		String info = game.toString();
-		JSONObject line;
-
-		try
-		{
-			line = new JSONObject(info);
-			JSONObject ttt = line.getJSONObject("GameServer");
-			int rs = ttt.getInt("robots");
-			int moves = ttt.getInt("moves");
-			int grade = ttt.getInt("grade");
-			server = new GameServer(game.getFruits(),moves,grade,rs,graph_string,game,Level_chooser);
-		}
-		catch (JSONException e) {e.printStackTrace();}
-	}
+	
 
 	
 	

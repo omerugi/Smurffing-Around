@@ -127,11 +127,11 @@ public class NodeV implements node_data, Serializable {
 	public String to_kml() {
 
 		String temp = " <Placemark>\r\n" + 
-				"		<name>Vertex:" +this.getKey() +"</name>\r\n" +  
-				"		<description> Graph's vertex	</description>\n"+			
-				"		<Point>\r\n" +  
-				"			<coordinates>"+this.getLocation().x() +","+this.getLocation().y()+",0</coordinates>\r\n" + 
-				"		</Point>\r\n" + 
+				"		<name>\r\n Vertex:" +this.getKey() +"\r\n \t\t</name>\r\n" +  
+				"		\t<description>\r\n \t\t\t\tGraph's vertex	\r\n\t\t\t</description>\n"+			
+				"		\t\t\t<Point>\r\n" +  
+				"			\t\t\t<coordinates>\r\n"+"\t\t\t"+this.getLocation().x() +","+this.getLocation().y()+",0 \r\n\t\t\t\t\t\t</coordinates>\r\n" + 
+				"		\t\t\t</Point>\r\n" + 
 				"	</Placemark>\n";
 
 		return temp;

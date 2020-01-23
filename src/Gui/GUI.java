@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +35,9 @@ import Server.game_service;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
+import gameClient.SimpleDB;
+import utils.resultwindow;
+
 import java.text.DecimalFormat;
 
 
@@ -45,8 +49,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 
 	private static DecimalFormat df2 = new DecimalFormat("#.##");
-	private int Level;
-	private Graphics2D g4;
+	private int Level; private int UserId; private int ResChoice;
+	private Graphics2D g4; 
 	/////////////////////////////////////////////////////////////////
 	/////////////////////GUI_window_fields//////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -80,7 +84,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		((Observable) graph).addObserver(this);
 	}
 
-	public GUI(graph dg, game_service game,int gamechooser)
+	public GUI(graph dg, game_service game,int gamechooser,int UserId)
 	{
 		initGUI();
 		this.game = game; 
@@ -88,6 +92,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		this.graph = dg;
 		((Observable) graph).addObserver(this);
 		this.Level= gamechooser;
+		this.UserId=UserId;
 	}
 
 	/////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -103,12 +108,12 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		ImageIcon ImageIcon5 = new ImageIcon("data\\GameIcon.jpg");
 		Image GameIcon  =	ImageIcon5.getImage();
 		this.setIconImage(GameIcon);
-
+		
 
 
 		//creating menu bar//
 		MenuBar menuBar	 = new MenuBar();
-		Menu menu_file1	 = new Menu("file");
+		Menu menu_file1	 = new Menu("Score Board");
 
 
 		//adding the file section to the menu bar//
@@ -117,22 +122,16 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 		this.setMenuBar(menuBar);
 
 		//creating a item in bar for short path
-		MenuItem Save = new MenuItem("Save"); 
-		Save.addActionListener(this);
+		MenuItem Score = new MenuItem("MyBestScores"); 
+		Score.addActionListener(this);
 
-		//creating a item in bar for short path
-		MenuItem Load = new MenuItem("Load"); 
-		Load.addActionListener(this);
-
-		//creating a item in bar for clean graph
-		MenuItem clean_all = new MenuItem("clean all"); 
-		clean_all.addActionListener(this);
+		MenuItem Score1 = new MenuItem("WorldwideBestScores"); 
+		Score1.addActionListener(this);
 
 		//adding to menues:\\
 		//file
-		menu_file1.add(Save);
-		menu_file1.add(Load);
-		menu_file1.add(clean_all);
+		menu_file1.add(Score);
+		menu_file1.add(Score1);
 
 
 		//listen to the mouse\\
@@ -148,6 +147,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	private BufferedImage buff3;
 
 	JLabel background = null;
+	
 	//////////////////////////////////////////////Paint///////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void paint(Graphics g)
@@ -241,8 +241,37 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 	@Override
 	public void mouseReleased(MouseEvent e) {}
 	@Override
-	public void actionPerformed(ActionEvent e){}
-	@Override
+	public void actionPerformed(ActionEvent e){
+
+		
+		JFrame frame =null; 
+		JOptionPane pan = new JOptionPane();
+		
+		if(e.getActionCommand()=="MyBestScores") {
+			ResChoice=1;
+			resultwindow reswind = new  resultwindow(this.Level, UserId, ResChoice);
+			Thread t = new Thread(reswind); 
+			t.start();
+		}
+
+
+
+		if(e.getActionCommand()=="WorldwideBestScores") {
+			
+			ResChoice=2;
+			resultwindow reswind = new  resultwindow(this.Level, UserId, ResChoice);
+			Thread t = new Thread(reswind); 
+			t.start();
+		}
+
+
+
+
+
+
+
+	}
+
 	public void run() {
 		repaint();}
 	@Override
@@ -331,32 +360,32 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 
 		ImageIcon Score = new ImageIcon("data\\Score.png");
 		Image  Score1  = Score.getImage();
-		
-		g.drawImage(Score1, (int)(defultx*0.0313), (int)(defulty*0.075),
-					(int)(defulty*0.273),(int)(defulty*0.273), this);
 
-		
+		g.drawImage(Score1, (int)(defultx*0.0313), (int)(defulty*0.075),
+				(int)(defulty*0.273),(int)(defulty*0.273), this);
+
+
 		ImageIcon sd = new ImageIcon("data\\GameBoard.png");
 		Image  sd1  = sd.getImage();
 		g.drawImage(sd1, (int)(defultx*0.85),(int)(defulty*0.76),
-						(int)(defulty*0.233),(int)(defulty*0.233), this);
-		
-		
+				(int)(defulty*0.233),(int)(defulty*0.233), this);
+
+
 		Graphics2D G = (Graphics2D)g;
 		float f=26.0f; // font size.
 		G.setFont(G.getFont().deriveFont(f));
 		G.drawString("Time-Left    "+ game.timeToEnd()/1000 , (int)(defultx*0.857),(int)(defulty*0.842));
-		
+
 		G.drawString("Level:       "+ this.Level			, (int)(defultx*0.857),(int)(defulty*0.865));
-		
+
 		g4.setColor(Color.BLACK);
 		f=35.0f; // font size.
 		g4.setFont(g4.getFont().deriveFont(f));
 		g4.drawString("Score:", (int)(defultx*0.070), (int)(defulty*0.24));
-		
-		
-		
-		
+
+
+
+
 	}
 
 	///////////////////////////////////////////////////Paint Graph End////////////////////////////////////////////////////////
@@ -420,7 +449,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, Runnab
 				g4.drawString(""+rid, reallocX(x)-20, reallocY(y)-20);
 			} catch (JSONException e) {e.printStackTrace();}
 		}
-				
+
 		g4.setColor(Color.RED);
 		float f1=35.0f; // font size.
 		g4.setFont(g4.getFont().deriveFont(f1));

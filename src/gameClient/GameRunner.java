@@ -6,7 +6,7 @@ public class GameRunner {
 		/////////////////////////////////////////////////////////////////
 		//////////////////////////////Music//////////////////////////////
 		////////////////////////////////////////////////////////////////
-		//MusicPlayer play = new MusicPlayer("data\\smurfs.mp3");
+		MusicPlayer play = new MusicPlayer("data\\smurfs.mp3");
 		//SimplePlayer play = new SimplePlayer("data\\dropIt.mp3");
 
 
@@ -21,7 +21,7 @@ public class GameRunner {
 		////////////////////////////////////////////////////////////////
 
 
-		//Thread T_PlayMusic = new Thread(play); 	//music thread
+		Thread T_PlayMusic = new Thread(play); 	//music thread
 		Thread T_Game = new Thread(DGame); 		//Game thread
 		
 
@@ -29,7 +29,7 @@ public class GameRunner {
 		////////////////////////GoToGame/////////////////////////////////
 		////////////////////////////////////////////////////////////////
 		
-		//T_PlayMusic.start(); //play music
+		T_PlayMusic.start(); //play music
 		T_Game.start();		 //play game
 	}
 
